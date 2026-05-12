@@ -19,12 +19,12 @@ The differentiator on your portfolio is **not the chatbot** — it's the evaluat
 Pick **one** and write it in below — delete the rest:
 
 - [ ] **University course materials** — your professors' slides, recordings, problem sets, past exams
-- [ ] **German legal texts** — gesetze-im-internet.de (BGB, StGB, GG…). Public domain, real content.
+- [x] **German legal texts** — gesetze-im-internet.de (BGB, StGB, GG…). Public domain, real content.
 - [ ] **Bundestag transcripts** — open-discourse.org has structured parliamentary debates
 - [ ] **ArXiv papers in one subfield** — e.g. "RL for robotics 2022–2025"
 - [ ] **A large open-source project's docs + source comments** — e.g. all of FastAPI, or PyTorch
 
-**Your chosen domain:** _________________________________
+**Your chosen domain:** GermanLawRAG — German legal texts from Gesetze im Internet / Bundestag law text data
 
 Why this matters: a generic "chat with PDFs" project signals nothing. A focused, defensible domain choice signals taste and judgment.
 
