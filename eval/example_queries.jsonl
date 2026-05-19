@@ -1,0 +1,10 @@
+{"query": "Wo ist die Meinungsfreiheit geregelt?", "expect_law": "GG", "expect_unit": "Art 5", "note": "Semantic paraphrase, no shared keyword with the article text - dense retrieval should shine."}
+{"query": "§ 242 StGB", "expect_law": "StGB", "expect_unit": "§ 242", "note": "Exact section reference - BM25 should nail this even if dense drifts."}
+{"query": "Welche Pflichten hat der Verkaeufer bei einem Kaufvertrag?", "expect_law": "BGB", "expect_unit": "§ 433", "note": "Conceptual question about a named contract type."}
+{"query": "Notwehr", "expect_law": "StGB", "expect_unit": "§ 32", "note": "Single legal term - tests term-to-section recall."}
+{"query": "Wann verjaehren Ansprueche?", "expect_law": "BGB", "expect_unit": "§ 195", "note": "Concept (Verjaehrung) that maps to a specific regular limitation period."}
+{"query": "Schutz des Eigentums in der Verfassung", "expect_law": "GG", "expect_unit": "Art 14", "note": "Paraphrase pointing at a constitutional guarantee."}
+{"query": "Voraussetzungen einer wirksamen Kuendigung des Arbeitsverhaeltnisses", "expect_law": "KSchG", "expect_unit": "", "note": "Cross-law topic - acceptable hits in KSchG or BGB."}
+{"query": "Was regelt das Betriebsverfassungsgesetz zur Mitbestimmung?", "expect_law": "BetrVG", "expect_unit": "", "note": "Names the law explicitly - should be an easy lexical hit."}
+{"query": "Gewaehrleistung bei Maengeln der Kaufsache", "expect_law": "BGB", "expect_unit": "§ 434", "note": "Warranty concept; relevant sections cluster around 434 and 437."}
+{"query": "Pflicht zur Stellung eines Insolvenzantrags", "expect_law": "InsO", "expect_unit": "", "note": "Tests retrieval into a less common code (Insolvenzordnung)."}

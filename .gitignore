@@ -54,5 +54,6 @@ frontend/.env.*
 **/.DS_Store
 *.swp
 .idea/
+.claude/
 *.log
 logs/

@@ -1,7 +1,8 @@
 services:
   qdrant:
-    image: qdrant/qdrant:v1.12.1
+    image: qdrant/qdrant:v1.18.0
     container_name: germanlawrag-qdrant
+    restart: unless-stopped
     ports:
       - "6333:6333"
       - "6334:6334"
@@ -11,6 +12,7 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: germanlawrag-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: germanlawrag
       POSTGRES_PASSWORD: germanlawrag
