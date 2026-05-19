@@ -10,7 +10,7 @@ The project is built around one focused domain:
 
 ## Current Status
 
-Project structure is ready and the ingestion pipeline understands the local `data/raw/german-laws` clone.
+Project structure, ingestion, curated indexing, hybrid retrieval, and the first retrieval API endpoints are in place for the local `data/raw/german-laws` clone.
 
 ## Architecture
 
@@ -117,6 +117,16 @@ For a quick parser check:
 uv run python scripts/build_chunks.py --raw-dir data/raw/german-laws --limit 5
 ```
 
+7. Build the first Qdrant retrieval index:
+
+```bash
+make up
+make index
+```
+
+`make index` embeds the curated subset of major German codes for development.
+Use `make index-all` only when you want to embed the full corpus.
+
 ## VS Code
 
 This repo includes `.vscode/` settings for Python, Ruff, pytest, and a FastAPI launch configuration.
@@ -132,6 +142,7 @@ Recommended workflow:
 
 1. Keep the cloned `german-laws` data at `data/raw/german-laws/`.
 2. Build normalized documents and legal-heading chunks.
-3. Add embeddings for `data/processed/chunks.jsonl`.
-4. Store embedded chunks in Qdrant.
-5. Build the first 10 hand-written evaluation queries.
+3. Build or refresh the curated Qdrant index with `make index`.
+4. Test `/index/stats` and `/retrieve`.
+5. Add generation with source-grounded citations.
+6. Expand the smoke queries into a larger golden evaluation set.

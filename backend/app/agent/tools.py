@@ -14,4 +14,6 @@ class RetrievalTool:
     description = "Search the German law corpus for source passages."
 
     def __call__(self, query: str) -> list[RetrievedChunk]:
-        raise NotImplementedError("Wire this to the hybrid retriever after ingestion is implemented.")
+        raise NotImplementedError(
+            "Wire this to the hybrid retriever after ingestion is implemented."
+        )

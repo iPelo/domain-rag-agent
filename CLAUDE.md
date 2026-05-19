@@ -16,7 +16,7 @@ This repository is **public** on GitHub. Never commit:
 - API keys, tokens, certificates, private keys, or credentials
 - `data/raw/german-laws/` or any other raw dataset
 - `data/processed/*.jsonl` generated corpus files
-- local vector stores, database files, caches, `.DS_Store`
+- local vector stores, database files, caches, `.DS_Store`, `.idea/`, `.claude/`, `.venv/`
 
 Before pushing, sanity-check:
 
@@ -35,6 +35,8 @@ make up             # docker compose up -d  (qdrant + postgres)
 make down
 make dev            # uvicorn app.main:app --reload --app-dir backend
 make chunks         # build processed corpus from data/raw/german-laws
+make index          # build curated Qdrant index
+make index-all      # build full Qdrant index
 make test           # uv run pytest
 make lint           # ruff check + mypy
 make format         # ruff format + ruff --fix
@@ -59,7 +61,7 @@ Type checking targets `backend/app` in strict mode; tests live under `backend/te
 Four layers, each a backend module:
 
 1. **`app.ingestion`** — load Markdown laws → parse YAML-ish front matter → chunk by legal heading → JSONL.
-2. **`app.retrieval`** — BM25 (`rank_bm25`) + dense (Qdrant) + Reciprocal Rank Fusion + reranker stub.
+2. **`app.retrieval`** — BM25 (`rank_bm25`) + dense (Qdrant) + Reciprocal Rank Fusion + optional cross-encoder reranker.
 3. **`app.agent`** — system prompt + `RetrievalTool` stub (not yet wired).
 4. **`app.eval`** — `precision_at_k`, `mean_reciprocal_rank`; LLM-as-judge to come.
 
@@ -69,7 +71,8 @@ Data flow:
 data/raw/german-laws/<letter>/<slug>/index.md
   -> app.ingestion.pipeline.build_processed_corpus
   -> data/processed/documents.jsonl + chunks.jsonl
-  -> (next) embed + upsert into Qdrant collection `german_law_chunks`
+  -> scripts/build_index.py
+  -> data/processed/chunks.curated.jsonl + Qdrant collection `german_law_chunks`
   -> /retrieve endpoint
 ```
 
@@ -84,6 +87,8 @@ The loader (`backend/app/ingestion/loaders.py`) is **source-specific** for `bund
 
 The chunker (`backend/app/ingestion/chunking.py`):
 
+- Supports `legal-heading`, `fixed`, and `recursive` strategies.
+- Production default is `legal-heading`.
 - Splits by Markdown headings, falling back to fixed-size (1600 chars, 180 overlap) when a section is too long.
 - Emits stable chunk IDs like `german-laws::gg::art-5` and citation strings like `GG Art 5`.
 - Stores hierarchy (e.g. `["I. - Die Grundrechte", "Art 5"]`) so citations can include parent context.
@@ -101,23 +106,39 @@ If a run produces wildly different numbers, the parser or the raw dataset layout
 
 ## Configuration
 
-Settings live in `backend/app/config.py` (`pydantic-settings`), loaded from `.env`. Defaults assume local Docker services (`qdrant: http://localhost:6333`, postgres on `5432`). Embedding default is `BAAI/bge-m3`, reranker is `BAAI/bge-reranker-v2-m3`. `data_raw_dir` defaults to `data/raw` but the Makefile points the chunker at `data/raw/german-laws` explicitly.
+Settings live in `backend/app/config.py` (`pydantic-settings`), loaded from `.env`. Defaults assume local Docker services (`qdrant: http://localhost:6333`, postgres on `5432`). Embedding default is `BAAI/bge-m3`, reranker is `BAAI/bge-reranker-v2-m3`. `data_raw_dir` defaults to `data/raw/german-laws`, and `index_chunks_path` defaults to `data/processed/chunks.curated.jsonl`.
 
 ## Current State & Next Step
 
-Implemented: ingestion pipeline end-to-end + tests; retrieval/agent/eval modules exist as stubs.
+Implemented:
 
-Not yet implemented: embedding, Qdrant indexing, `/retrieve` endpoint, agent loop, evaluation runner.
+- ingestion pipeline end-to-end + tests
+- curated corpus selection
+- Qdrant indexing script
+- BM25 retrieval
+- dense retrieval
+- hybrid RRF retrieval
+- optional reranker
+- `/index/stats` and `/retrieve` endpoints
+
+Not yet implemented:
+
+- agent loop
+- generation with cited answers
+- evaluation runner and golden set
 
 Recommended next vertical slice:
 
-1. Read `data/processed/chunks.jsonl`.
-2. Embed chunk text with the configured embedding model.
-3. Create (or recreate) the Qdrant collection `german_law_chunks`.
-4. Upsert chunk vectors + metadata.
-5. Add a `/retrieve` endpoint returning top chunks with citations.
+1. Start the API with `make dev`.
+2. Check `/index/stats`.
+3. Try `/retrieve?q=Meinungsfreiheit&law_code=GG`.
+4. Add generation with grounded citations.
+5. Wire generation into the agent retrieve tool.
 
-After that: BM25 index → RRF fusion → reranker → golden set of 30–50 query/expected-source triples (the eval harness is what makes this project defensible).
+The Qdrant point count must match `wc -l data/processed/chunks.curated.jsonl`.
+If it is lower, a previous index build was interrupted; rerun `make index`.
+
+After that: generation with citations → agent retrieve tool → golden set of 30–50 query/expected-source triples.
 
 ## Verification status (from last handoff)
 
@@ -126,6 +147,20 @@ Passed:
 ```bash
 python3 -m compileall -q backend scripts
 python3 scripts/build_chunks.py --raw-dir data/raw/german-laws
+uv run ruff check .
+uv run mypy
+uv run pytest
 ```
 
-`uv run pytest` was not run in the prior environment (no pytest in non-uv Python). Run `uv sync --extra dev` first.
+Also verified:
+
+```bash
+make index
+make queries
+GET /index/stats
+GET /retrieve?q=§%20242%20StGB&top_k=1
+```
+
+Latest local curated index count: 15,174 runtime chunks and 15,174 Qdrant
+points. `make queries` currently meets 8/10 loose smoke expectations; the
+remaining misses are broad semantic baseline-quality issues.

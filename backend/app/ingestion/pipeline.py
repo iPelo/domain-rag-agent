@@ -21,17 +21,17 @@ def build_processed_corpus(
         documents = documents[:limit]
 
     chunk_count = 0
-    with documents_output_path.open("w", encoding="utf-8") as documents_handle:
-        with chunks_output_path.open("w", encoding="utf-8") as chunks_handle:
-            for document in documents:
-                documents_handle.write(
-                    json.dumps(_document_to_json(document), ensure_ascii=False) + "\n"
-                )
-                for chunk in chunk_document(document):
-                    chunks_handle.write(
-                        json.dumps(_chunk_to_json(chunk), ensure_ascii=False) + "\n"
-                    )
-                    chunk_count += 1
+    with (
+        documents_output_path.open("w", encoding="utf-8") as documents_handle,
+        chunks_output_path.open("w", encoding="utf-8") as chunks_handle,
+    ):
+        for document in documents:
+            documents_handle.write(
+                json.dumps(_document_to_json(document), ensure_ascii=False) + "\n"
+            )
+            for chunk in chunk_document(document):
+                chunks_handle.write(json.dumps(_chunk_to_json(chunk), ensure_ascii=False) + "\n")
+                chunk_count += 1
 
     return len(documents), chunk_count
 

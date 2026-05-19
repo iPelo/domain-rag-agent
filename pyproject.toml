@@ -45,5 +45,5 @@ strict = true
 files = ["backend/app"]
 
 [[tool.mypy.overrides]]
-module = ["bs4.*", "qdrant_client.*", "rank_bm25.*"]
+module = ["bs4.*", "qdrant_client.*", "rank_bm25.*", "sentence_transformers.*"]
 ignore_missing_imports = true

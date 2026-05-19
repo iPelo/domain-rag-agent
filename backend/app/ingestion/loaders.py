@@ -2,7 +2,6 @@ from pathlib import Path
 
 from app.ingestion.models import RawDocument
 
-
 SUPPORTED_EXTENSIONS = {".html", ".htm", ".xml", ".txt", ".md"}
 GERMAN_LAWS_DATASET = "bundestag/gesetze"
 
