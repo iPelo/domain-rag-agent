@@ -58,7 +58,7 @@ Why this matters: a generic "chat with PDFs" project signals nothing. A focused,
 | Vector DB | Qdrant | Rust core, great filtering, easy local Docker |
 | Embeddings | `bge-m3` or `nomic-embed-text` | Multilingual (matters for German) |
 | Reranker | `bge-reranker-v2-m3` | Big quality boost, runs locally on M4 |
-| LLM | Claude/GPT + Ollama (Llama 3.1 8B) fallback | Cost vs. quality trade-off |
+| LLM | Hosted LLM + Ollama (Llama 3.1 8B) fallback | Cost vs. quality trade-off |
 | Orchestration | LangGraph **or** hand-rolled | Hand-rolled is more impressive |
 | Observability | Langfuse (self-hosted Docker) | Free, OSS |
 | Frontend | Next.js 14 + Tailwind | Standard, fast |
