@@ -1,4 +1,4 @@
-# DomainRAG — Production-grade Retrieval-Augmented AI Assistant
+# DomainRAG — Production-grade Retrieval-Augmented Assistant
 
 > An end-to-end RAG + agent system over **[YOUR DOMAIN]**. Hybrid retrieval, reranking, a real evaluation harness, observability, and a deployed demo.
 
@@ -52,7 +52,7 @@ Why this matters: a generic "chat with PDFs" project signals nothing. A focused,
 
 | Layer | Choice | Why |
 |---|---|---|
-| Language | Python 3.12 | Standard for AI/ML |
+| Language | Python 3.12 | Standard for ML and data applications |
 | Pkg manager | `uv` | 10–100× faster than pip/poetry |
 | API | FastAPI | Async, typed, auto OpenAPI |
 | Vector DB | Qdrant | Rust core, great filtering, easy local Docker |
