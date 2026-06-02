@@ -159,6 +159,11 @@ Recommended workflow:
 3. Select `.venv/bin/python` as the interpreter after running `uv sync`.
 4. Use the "FastAPI: backend" launch configuration.
 
+Useful tasks:
+
+- `GermanLawRAG: Build Retrieval Index`: starts Qdrant and rebuilds the curated index.
+- `GermanLawRAG: Run Retrieval Evaluation`: runs the golden-set retrieval report.
+
 ## Next Milestones
 
 1. Keep the cloned `german-laws` data at `data/raw/german-laws/`.
