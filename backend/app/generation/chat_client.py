@@ -19,7 +19,7 @@ class ModelRequestError(RuntimeError):
 
 class ChatClient(Protocol):
     def complete(self, *, system_prompt: str, user_prompt: str) -> str:
-        """Return one generated answer."""
+        """Return one answer."""
 
 
 class HostedChatClient:

@@ -143,7 +143,7 @@ def answer(
         )
     except CitationValidationError as exc:
         raise HTTPException(
-            status_code=502, detail=f"Generated answer is not grounded: {exc}"
+            status_code=502, detail=f"Answer is not grounded: {exc}"
         ) from exc
     except ModelRequestError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc

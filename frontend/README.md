@@ -1,5 +1,5 @@
 # Frontend
 
-Next.js will live here in Phase 6.
+The frontend will live here once the backend retrieval and answer endpoints are stable.
 
-For now, the backend and evaluation harness are the priority because retrieval quality is the differentiator for this project.
+For now, the backend and evaluation harness come first. The UI should stay thin: submit a question, show cited passages, and make it easy to inspect sources.

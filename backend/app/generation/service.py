@@ -15,7 +15,7 @@ _UNSUPPORTED_MARKER = "retrieved sources do not contain enough information"
 
 
 class CitationValidationError(RuntimeError):
-    """Raised when a generated answer is not grounded in the retrieved chunks."""
+    """Raised when an answer is not grounded in the retrieved chunks."""
 
 
 @dataclass(frozen=True)

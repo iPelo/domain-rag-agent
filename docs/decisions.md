@@ -1,12 +1,12 @@
 # Decisions
 
-This file records the engineering decisions that make the project defensible.
+This file records the engineering decisions behind the current implementation.
 
 ## 1. Domain
 
 Chosen domain: German legal texts.
 
-Reason: the corpus is specific, high-stakes enough to expose hallucination risk, multilingual retrieval matters, and answer quality can be judged against exact source passages.
+Reason: the corpus is specific, multilingual retrieval matters, and answer quality can be checked against exact source passages.
 
 ## 2. Initial Data Strategy
 
@@ -22,7 +22,7 @@ Initial strategy: legal-heading chunks with fixed-size fallback splitting.
 
 Why: German laws are naturally organized by headings such as `§ 1`, `Art 5`, `Präambel`, and `Anlage`. Chunking by those headings gives more meaningful retrieval results and citations than arbitrary text windows. If a legal unit is too long, it is split into overlapping character chunks.
 
-Later iterations should compare this against pure fixed-size chunks and paragraph-aware chunks.
+The comparison script also measures fixed-size and paragraph-aware chunking so changes can be discussed with numbers instead of preference.
 
 ## 4. Retrieval Strategy
 

@@ -17,7 +17,7 @@ The raw dataset is present at:
 data/raw/german-laws/
 ```
 
-This is a Markdown repository generated from the XML source at Gesetze im Internet. Each law generally lives at:
+This is a Markdown repository converted from the XML source at Gesetze im Internet. Each law generally lives at:
 
 ```text
 data/raw/german-laws/<first-character>/<law-slug>/index.md
@@ -34,7 +34,7 @@ The ingestion code uses those fields to preserve law title, abbreviation, slug, 
 
 ## Raw Data Policy
 
-Raw source files belong in `data/raw/` and are intentionally gitignored. This keeps the repository light and avoids accidentally committing large generated corpora.
+Raw source files belong in `data/raw/` and are intentionally gitignored. This keeps the repository light and avoids committing large local corpora.
 
 Recommended local layout:
 
@@ -45,7 +45,7 @@ data/raw/
 
 ## Normalized Output
 
-The ingestion pipeline should write processed artifacts to:
+The ingestion pipeline writes processed artifacts to:
 
 ```text
 data/processed/

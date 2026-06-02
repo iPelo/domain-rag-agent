@@ -1,8 +1,10 @@
 # GermanLawRAG
 
-Production-grade retrieval service for German legal texts.
+GermanLawRAG is a retrieval service for German federal law texts. It ingests the
+local `bundestag/gesetze` Markdown corpus, builds searchable chunks, and returns
+answers with citations back to the source passages.
 
-The project is built around one focused domain:
+The scope is intentionally narrow:
 
 - Dataset/domain: GermanLawRAG
 - Primary source family: Gesetze im Internet / Bundestag `gesetze` Markdown data
@@ -10,8 +12,9 @@ The project is built around one focused domain:
 
 ## Current Status
 
-Project structure, ingestion, curated indexing, hybrid retrieval, and grounded answer
-generation are in place for the local `data/raw/german-laws` clone.
+The backend can parse the local law corpus, build a curated Qdrant index, run
+BM25 and dense retrieval, fuse rankings, rerank results, and produce cited
+answers from retrieved chunks.
 
 ## Architecture
 
@@ -30,8 +33,7 @@ generation are in place for the local `data/raw/german-laws` clone.
         |-- BM25 retrieval
         |-- hybrid fusion
         |-- reranking
-        |-- grounded answer generation
-        |-- agent tools
+        |-- cited answer workflow
         |-- evaluation harness
         |
         v
@@ -41,14 +43,14 @@ generation are in place for the local `data/raw/german-laws` clone.
 ## Repository Layout
 
 ```text
-domain-rag-agent/
+germanlawrag/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py
 │   │   ├── config.py
 │   │   ├── ingestion/
 │   │   ├── retrieval/
-│   │   ├── agent/
+│   │   ├── workflow/
 │   │   └── eval/
 │   └── tests/
 ├── data/
@@ -129,7 +131,7 @@ make index
 `make index` embeds the curated subset of major German codes for development.
 Use `make index-all` only when you want to embed the full corpus.
 
-8. Configure answer generation:
+8. Configure cited answers:
 
 ```bash
 MODEL_PROVIDER=hosted
@@ -163,5 +165,5 @@ Recommended workflow:
 2. Build normalized documents and legal-heading chunks.
 3. Build or refresh the curated Qdrant index with `make index`.
 4. Test `/index/stats` and `/retrieve`.
-5. Add the multi-step agent loop on top of the wired retrieval tool.
-6. Expand the smoke queries into a larger golden evaluation set.
+5. Expand `/answer` coverage with more citation-focused tests.
+6. Grow the smoke queries into a larger golden evaluation set.

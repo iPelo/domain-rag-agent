@@ -1,5 +1,5 @@
 [project]
-name = "domain-rag-agent"
+name = "germanlawrag"
 version = "0.1.0"
 description = "GermanLawRAG: retrieval service for German legal texts."
 readme = "README.md"

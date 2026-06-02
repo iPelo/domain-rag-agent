@@ -27,7 +27,24 @@ dist/
 *.keystore
 secrets/
 
-# Local data and generated corpora
+# Local-only notes and workspace rules
+[Cc][Ll][Aa][Uu][Dd][Ee].md
+[Aa][Gg][Ee][Nn][Tt][Ss].md
+[Cc][Oo][Dd][Ee][Xx].md
+.[Cc][Oo][Dd][Ee][Xx]/
+.[Aa][Gg][Ee][Nn][Tt][Ss]/
+.[Cc][Uu][Rr][Ss][Oo][Rr]/
+.cursorrules
+.[Ww][Ii][Nn][Dd][Ss][Uu][Rr][Ff]/
+README-*-rag-[Aa][Gg][Ee][Nn][Tt].md
+*local-note*.md
+*Local-note*.md
+*draft*.md
+*Draft*.md
+*.local.md
+*.scratch.md
+
+# Local data and corpora
 data/raw/**
 !data/raw/.gitkeep
 data/processed/**

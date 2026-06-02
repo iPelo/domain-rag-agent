@@ -1,8 +1,8 @@
 from typing import cast
 
-from app.agent.tools import RetrievalTool
 from app.retrieval.models import IndexedChunk, ScoredChunk
 from app.retrieval.service import RetrievalService
+from app.workflow.tools import RetrievalTool
 
 
 class FakeRetrievalService:
