@@ -1,6 +1,6 @@
 # GermanLawRAG
 
-Production-grade retrieval-augmented assistant for German legal texts.
+Production-grade retrieval service for German legal texts.
 
 The project is built around one focused domain:
 

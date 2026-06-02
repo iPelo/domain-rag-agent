@@ -20,10 +20,6 @@ class Settings(BaseSettings):
     embedding_model: str = "BAAI/bge-m3"
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
 
-    llm_provider: str = "openai"
-    openai_api_key: str | None = None
-    anthropic_api_key: str | None = None
-
     langfuse_host: str = "http://localhost:3000"
     langfuse_public_key: str | None = None
     langfuse_secret_key: str | None = None

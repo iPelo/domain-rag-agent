@@ -12,7 +12,7 @@ GermanLawRAG is split into four layers:
 - `app.ingestion`: raw document loading, parsing, chunking, and processed JSONL output.
 - `app.retrieval`: BM25, dense retrieval, ranking fusion, and later reranking.
 - `app.agent`: prompts and tools used by the answering loop.
-- `app.eval`: deterministic metrics and future LLM-as-judge evaluation.
+- `app.eval`: deterministic metrics and future model-graded evaluation.
 
 ## Data Flow
 

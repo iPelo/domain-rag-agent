@@ -1,6 +1,6 @@
 # DomainRAG — Production-grade Retrieval-Augmented Assistant
 
-> An end-to-end RAG + agent system over **[YOUR DOMAIN]**. Hybrid retrieval, reranking, a real evaluation harness, observability, and a deployed demo.
+> An end-to-end RAG service over **[YOUR DOMAIN]**. Hybrid retrieval, reranking, a real evaluation harness, observability, and a deployed demo.
 
 **Status:** 🚧 In development
 **Live demo:** _coming_
@@ -10,7 +10,7 @@
 
 ## The Problem
 
-LLMs hallucinate when asked about specific documents. Naive RAG (chunk + embed + retrieve + stuff) helps but has a lot of failure modes that almost no one in a portfolio bothers to measure. This project builds a real RAG + agent system for **one specific domain** and rigorously evaluates each architectural choice.
+Generative models can drift when asked about specific documents. Naive RAG (chunk + embed + retrieve + stuff) helps but has a lot of failure modes that almost no one in a portfolio bothers to measure. This project builds a real RAG service for **one specific domain** and rigorously evaluates each architectural choice.
 
 The differentiator on your portfolio is **not the chatbot** — it's the evaluation harness and the engineering decisions you can defend.
 
@@ -58,7 +58,7 @@ Why this matters: a generic "chat with PDFs" project signals nothing. A focused,
 | Vector DB | Qdrant | Rust core, great filtering, easy local Docker |
 | Embeddings | `bge-m3` or `nomic-embed-text` | Multilingual (matters for German) |
 | Reranker | `bge-reranker-v2-m3` | Big quality boost, runs locally on M4 |
-| LLM | Hosted LLM + Ollama (Llama 3.1 8B) fallback | Cost vs. quality trade-off |
+| Answer model | Hosted model + local fallback | Cost vs. quality trade-off |
 | Orchestration | LangGraph **or** hand-rolled | Hand-rolled is more impressive |
 | Observability | Langfuse (self-hosted Docker) | Free, OSS |
 | Frontend | Next.js 14 + Tailwind | Standard, fast |
@@ -87,13 +87,13 @@ Why this matters: a generic "chat with PDFs" project signals nothing. A focused,
 
 ### Phase 4 — Evaluation ⭐ THE PART THAT MAKES THIS A PORTFOLIO PROJECT (Week 4)
 - [ ] Hand-build a **golden set** of 30–50 `(query, expected_answer, expected_source_chunks)` triples
-- [ ] Metrics: retrieval precision@k, MRR, faithfulness (LLM-as-judge), answer relevance
+- [ ] Metrics: retrieval precision@k, MRR, model-graded faithfulness, answer relevance
 - [ ] Run eval, write results table to `eval/results/`, commit it
 - [ ] **Comparison table:** naive RAG vs. hybrid vs. hybrid+rerank vs. agent loop. This goes in your portfolio writeup.
 
 ### Phase 5 — Observability + hardening (Week 5)
 - [ ] Self-host Langfuse via `docker compose`
-- [ ] Instrument every LLM call and retrieval
+- [ ] Instrument every generation call and retrieval
 - [ ] Cost tracking per request
 - [ ] Rate limiting + API key auth
 
@@ -105,7 +105,7 @@ Why this matters: a generic "chat with PDFs" project signals nothing. A focused,
 
 ## What I'm trying to learn / demonstrate
 
-- Real LLM application engineering, not just API calls
+- Real retrieval and generation engineering, not just API calls
 - Honest evaluation of retrieval and generation
 - Production concerns: cost, latency, observability
 - Hybrid retrieval and articulating its trade-offs
@@ -141,7 +141,7 @@ domain-rag-agent/
 
 ## Decisions to document in `docs/decisions.md`
 
-This file is what makes the difference between "another LLM project" and "this candidate thinks." For each, write 1–3 paragraphs:
+This file is what makes the difference between "another model-backed project" and "this candidate thinks." For each, write 1–3 paragraphs:
 
 1. Chunking strategy (and what you tried that didn't work)
 2. Embedding model choice and language considerations
@@ -152,7 +152,7 @@ This file is what makes the difference between "another LLM project" and "this c
 
 ## Resources to read first
 
-- Anthropic, "Contextual Retrieval" (blog post)
+- Contextual Retrieval writeups
 - LlamaIndex retrieval docs (read even if you don't use the library)
 - RAGAS paper, for evaluation metric ideas
 - Qdrant tutorials
