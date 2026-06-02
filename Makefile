@@ -1,4 +1,4 @@
-.PHONY: install dev chunks index index-all chunking-compare queries test lint format up down
+.PHONY: install dev chunks index index-all chunking-compare queries eval test lint format up down
 
 install:
 	uv sync --extra dev
@@ -20,6 +20,9 @@ chunking-compare:
 
 queries:
 	uv run python scripts/run_example_queries.py
+
+eval:
+	uv run python scripts/run_eval.py
 
 test:
 	uv run pytest

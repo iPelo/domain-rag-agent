@@ -51,6 +51,8 @@ data/processed/**
 !data/processed/.gitkeep
 eval/results/*
 !eval/results/.gitkeep
+!eval/results/latest.json
+!eval/results/latest.md
 
 # Local databases and vector stores
 *.db
