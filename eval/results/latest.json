@@ -1,5 +1,5 @@
 {
-  "run_id": "20260602T172245Z",
+  "run_id": "20260602T175703Z",
   "golden_set": "eval/golden_set.jsonl",
   "case_count": 44,
   "top_k": 5,
@@ -770,31 +770,1525 @@
       "mode": "dense",
       "rerank": false,
       "summary": {
-        "completed_cases": 0,
+        "completed_cases": 44,
         "total_cases": 44,
-        "hit_rate": 0.0,
-        "mean_precision_at_k": 0.0,
-        "mean_mrr": 0.0
+        "hit_rate": 0.9772727272727273,
+        "mean_precision_at_k": 0.19545454545454544,
+        "mean_mrr": 0.8825757575757577
       },
-      "errors": [
-        "Qdrant unavailable: ResponseHandlingException: [Errno 61] Connection refused"
-      ],
-      "cases": []
+      "errors": [],
+      "cases": [
+        {
+          "id": "gg_art_1_human_dignity",
+          "query": "Welche Norm schützt die Menschenwürde im Grundgesetz?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-1"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-1",
+            "german-laws::owig_1968::sec-132-einschrankung-von-grundrechten",
+            "german-laws::ao_1977::sec-413-einschrankung-von-grundrechten",
+            "german-laws::gg::art-3",
+            "german-laws::gg::art-19"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_2_free_development",
+          "query": "Wo steht das Recht auf freie Entfaltung der Persönlichkeit?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-2"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-2",
+            "german-laws::gg::art-5",
+            "german-laws::urhg::sec-19-vortrags-auffuhrungs-und-vorfuhrungsrecht",
+            "german-laws::gg::art-4",
+            "german-laws::bgb::sec-1631-inhalt-und-grenzen-der-personensorge"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_3_equality",
+          "query": "Welche Grundgesetzregel sagt, dass alle Menschen vor dem Gesetz gleich sind?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-3"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-3",
+            "german-laws::gg::praambel",
+            "german-laws::gg::art-1",
+            "german-laws::gg::art-33",
+            "german-laws::gg::art-19"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_4_religion",
+          "query": "Welche Norm schützt Glaubens- und Gewissensfreiheit?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-4"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-4",
+            "german-laws::stgb::sec-166-beschimpfung-von-bekenntnissen-religionsgesellschaften-und-weltanschauungsvereinigungen",
+            "german-laws::gg::art-5",
+            "german-laws::stgb::sec-167-storung-der-religionsausubung",
+            "german-laws::zpo::sec-481-eidesleistung-eidesformel"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_5_expression",
+          "query": "Wo ist die Meinungsfreiheit geregelt?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-5"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-5",
+            "german-laws::gg::art-18",
+            "german-laws::stgb::sec-166-beschimpfung-von-bekenntnissen-religionsgesellschaften-und-weltanschauungsvereinigungen",
+            "german-laws::gg::art-17a",
+            "german-laws::gg::art-4"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_8_assembly",
+          "query": "Welche Vorschrift schützt friedliche Versammlungen ohne Waffen?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-8"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-8",
+            "german-laws::gg::art-4",
+            "german-laws::stpo::sec-415-hauptverhandlung-ohne-beschuldigten",
+            "german-laws::stgb::sec-126-storung-des-offentlichen-friedens-durch-androhung-von-straftaten",
+            "german-laws::stgb::sec-128-bildung-bewaffneter-gruppen"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_12_occupation",
+          "query": "Wo steht die Berufsfreiheit im Grundgesetz?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-12"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-12",
+            "german-laws::sgb_3::sec-27-versicherungsfreie-beschaftigte",
+            "german-laws::sgb_5::sec-6-versicherungsfreiheit",
+            "german-laws::sgb_3::sec-27-versicherungsfreie-beschaftigte-part-02",
+            "german-laws::sgb_5::sec-7-versicherungsfreiheit-bei-geringfugiger-beschaftigung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_14_property",
+          "query": "Welche Norm gewährleistet Eigentum und Erbrecht?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-14"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-14",
+            "german-laws::gg::art-74-part-02",
+            "german-laws::bgb::sec-2111-unmittelbare-ersetzung",
+            "german-laws::bgb::sec-2276-form",
+            "german-laws::bgb::sec-1931-gesetzliches-erbrecht-des-ehegatten"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_20_democracy",
+          "query": "Welche Vorschrift beschreibt Deutschland als demokratischen und sozialen Bundesstaat?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-20"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-20",
+            "german-laws::gg::praambel",
+            "german-laws::gg::art-23",
+            "german-laws::stgb::sec-92-begriffsbestimmungen",
+            "german-laws::gg::art-28"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_90_things",
+          "query": "Was sind Sachen im Sinne des BGB?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-90-begriff-der-sache"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-90-begriff-der-sache",
+            "german-laws::bgb::sec-92-verbrauchbare-sachen",
+            "german-laws::gg::art-73",
+            "german-laws::gvg::sec-95",
+            "german-laws::gg::art-74"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_104_incapacity",
+          "query": "Wo regelt das BGB die Geschäftsunfähigkeit?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-104-geschaftsunfahigkeit"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-104-geschaftsunfahigkeit",
+            "german-laws::bgb::sec-1304-geschaftsunfahigkeit",
+            "german-laws::bgb::sec-8-wohnsitz-nicht-voll-geschaftsfahiger",
+            "german-laws::bgb::sec-105a-geschafte-des-taglichen-lebens",
+            "german-laws::bgb::sec-682-fehlende-geschaftsfahigkeit-des-geschaftsfuhrers"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_145_offer_binding",
+          "query": "Welche Norm bindet den Antragenden an sein Vertragsangebot?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-145-bindung-an-den-antrag"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-145-bindung-an-den-antrag",
+            "german-laws::sgb_5::sec-111c-versorgungsvertrage-mit-rehabilitationseinrichtungen-verordnungsermachtigung-part-04",
+            "german-laws::bgb::sec-650b-anderung-des-vertrags-anordnungsrecht-des-bestellers",
+            "german-laws::sgb_5::sec-75b-richtlinie-zur-it-sicherheit-in-der-vertragsarztlichen-und-vertragszahnarztlichen-versor",
+            "german-laws::bgb::sec-630a-vertragstypische-pflichten-beim-behandlungsvertrag"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_195_limitation",
+          "query": "Wie lautet die regelmäßige Verjährungsfrist im BGB?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-195-regelmaige-verjahrungsfrist"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-195-regelmaige-verjahrungsfrist",
+            "german-laws::bgb::sec-199-beginn-der-regelmaigen-verjahrungsfrist-und-verjahrungshochstfristen",
+            "german-laws::bgb::sec-197-dreiigjahrige-verjahrungsfrist",
+            "german-laws::stgb::sec-78-verjahrungsfrist",
+            "german-laws::bgb::sec-327j-verjahrung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_242_good_faith",
+          "query": "Wo steht Leistung nach Treu und Glauben?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-242-leistung-nach-treu-und-glauben"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-242-leistung-nach-treu-und-glauben",
+            "german-laws::bgb::sec-294-tatsachliches-angebot",
+            "german-laws::bgb::sec-320-einrede-des-nicht-erfullten-vertrags",
+            "german-laws::bgb::sec-271-leistungszeit",
+            "german-laws::bgb::sec-323-rucktritt-wegen-nicht-oder-nicht-vertragsgema-erbrachter-leistung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_280_damages",
+          "query": "Welche BGB-Norm regelt Schadensersatz wegen Pflichtverletzung?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-280-schadensersatz-wegen-pflichtverletzung"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bbg_2009::sec-75-pflicht-zum-schadensersatz",
+            "german-laws::bgb::sec-823-schadensersatzpflicht",
+            "german-laws::bgb::sec-280-schadensersatz-wegen-pflichtverletzung",
+            "german-laws::zpo::sec-945-schadensersatzpflicht",
+            "german-laws::sgb_3::sec-321-schadensersatz"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.3333333333333333
+        },
+        {
+          "id": "bgb_311_obligations",
+          "query": "Welche Norm behandelt rechtsgeschäftliche und rechtsgeschäftsähnliche Schuldverhältnisse?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-311-rechtsgeschaftliche-und-rechtsgeschaftsahnliche-schuldverhaltnisse"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-311-rechtsgeschaftliche-und-rechtsgeschaftsahnliche-schuldverhaltnisse",
+            "german-laws::bgb::abschnitt-2-gestaltung-rechtsgeschaftlicher-schuldverhaltnisse-durch-allgemeine-geschaftsbedingu",
+            "german-laws::bgb::titel-8-dienstvertrag-und-ahnliche-vertrage",
+            "german-laws::zpo::sec-795-anwendung-der-allgemeinen-vorschriften-auf-die-weiteren-vollstreckungstitel",
+            "german-laws::inso::sec-279-gegenseitige-vertrage"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_433_sale_contract",
+          "query": "Wo stehen die typischen Pflichten beim Kaufvertrag?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-433-vertragstypische-pflichten-beim-kaufvertrag"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-433-vertragstypische-pflichten-beim-kaufvertrag",
+            "german-laws::bgb::sec-453-rechtskauf-verbrauchervertrag-uber-den-kauf-digitaler-inhalte",
+            "german-laws::bgb::sec-443-garantie",
+            "german-laws::bgb::sec-631-vertragstypische-pflichten-beim-werkvertrag",
+            "german-laws::bgb::sec-312j-besondere-pflichten-im-elektronischen-geschaftsverkehr-gegenuber-verbrauchern"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_434_defect",
+          "query": "Welche Vorschrift regelt den Sachmangel beim Kauf?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-434-sachmangel"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-475b-sachmangel-einer-ware-mit-digitalen-elementen",
+            "german-laws::bgb::sec-434-sachmangel",
+            "german-laws::bgb::sec-435-rechtsmangel",
+            "german-laws::bgb::sec-442-kenntnis-des-kaufers",
+            "german-laws::hgb::sec-377"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.5
+        },
+        {
+          "id": "bgb_823_tort",
+          "query": "Welche Norm regelt Schadensersatzpflicht bei Verletzung von Leben, Körper oder Eigentum?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-823-schadensersatzpflicht"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-823-schadensersatzpflicht",
+            "german-laws::bbg_2009::sec-76-ubergang-eines-schadensersatzanspruchs-gegen-dritte",
+            "german-laws::stvg::sec-11-umfang-der-ersatzpflicht-bei-korperverletzung",
+            "german-laws::bgb::sec-309-klauselverbote-ohne-wertungsmoglichkeit-part-02",
+            "german-laws::bgb::sec-843-geldrente-oder-kapitalabfindung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_13_omission",
+          "query": "Wo regelt das StGB Begehen durch Unterlassen?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-13-begehen-durch-unterlassen"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::owig_1968::sec-8-begehen-durch-unterlassen",
+            "german-laws::stgb::sec-13-begehen-durch-unterlassen",
+            "german-laws::bbg_2009::sec-77-nichterfullung-von-pflichten",
+            "german-laws::stgb::sec-16-irrtum-uber-tatumstande",
+            "german-laws::sgb_3::sec-404-bugeldvorschriften"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.5
+        },
+        {
+          "id": "stgb_15_intent_negligence",
+          "query": "Welche Vorschrift unterscheidet vorsätzliches und fahrlässiges Handeln?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-15-vorsatzliches-und-fahrlassiges-handeln"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-15-vorsatzliches-und-fahrlassiges-handeln",
+            "german-laws::owig_1968::sec-10-vorsatz-und-fahrlassigkeit",
+            "german-laws::owig_1968::sec-11-irrtum",
+            "german-laws::bgb::sec-276-verantwortlichkeit-des-schuldners",
+            "german-laws::stgb::sec-16-irrtum-uber-tatumstande"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_16_mistake",
+          "query": "Wo steht der Irrtum über Tatumstände?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-16-irrtum-uber-tatumstande"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-16-irrtum-uber-tatumstande",
+            "german-laws::owig_1968::sec-11-irrtum",
+            "german-laws::bgb::sec-1949-irrtum-uber-den-berufungsgrund",
+            "german-laws::inso::sec-250-versto-gegen-verfahrensvorschriften",
+            "german-laws::bgb::sec-686-irrtum-uber-person-des-geschaftsherrn"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_32_self_defense",
+          "query": "Welche Norm regelt Notwehr?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-32-notwehr"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::owig_1968::sec-15-notwehr",
+            "german-laws::stgb::sec-32-notwehr",
+            "german-laws::bgb::sec-227-notwehr",
+            "german-laws::gg::art-109a",
+            "german-laws::gg::art-80a"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.5
+        },
+        {
+          "id": "stgb_123_trespass",
+          "query": "Welche Strafnorm behandelt Hausfriedensbruch?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-123-hausfriedensbruch"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-123-hausfriedensbruch",
+            "german-laws::stgb::sec-124-schwerer-hausfriedensbruch",
+            "german-laws::owig_1968::sec-112-verletzung-der-hausordnung-eines-gesetzgebungsorgans",
+            "german-laws::stgb::sec-125-landfriedensbruch",
+            "german-laws::stgb::sec-126-storung-des-offentlichen-friedens-durch-androhung-von-straftaten"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_211_murder",
+          "query": "Wo steht Mord im StGB?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-211-mord"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-211-mord",
+            "german-laws::gvg::sec-74-part-02",
+            "german-laws::gvg::sec-74-part-03",
+            "german-laws::stpo::sec-100b-online-durchsuchung-part-04",
+            "german-laws::gvg::sec-120-part-02"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_223_bodily_harm",
+          "query": "Welche Norm regelt Körperverletzung?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-223-korperverletzung"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-223-korperverletzung",
+            "german-laws::stgb::sec-224-gefahrliche-korperverletzung",
+            "german-laws::stgb::sec-229-fahrlassige-korperverletzung",
+            "german-laws::stgb::sec-230-strafantrag",
+            "german-laws::stgb::sec-227-korperverletzung-mit-todesfolge"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_242_theft",
+          "query": "Welche Strafnorm regelt Diebstahl?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-242-diebstahl"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-242-diebstahl",
+            "german-laws::stgb::sec-243-besonders-schwerer-fall-des-diebstahls",
+            "german-laws::stgb::sec-244-diebstahl-mit-waffen-bandendiebstahl-wohnungseinbruchdiebstahl",
+            "german-laws::stgb::sec-244a-schwerer-bandendiebstahl",
+            "german-laws::stgb::sec-252-rauberischer-diebstahl"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_263_fraud",
+          "query": "Welche Vorschrift regelt Betrug?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-263-betrug"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-263-betrug",
+            "german-laws::stgb::sec-265b-kreditbetrug",
+            "german-laws::stpo::sec-100a-telekommunikationsuberwachung-part-03",
+            "german-laws::stgb::sec-264a-kapitalanlagebetrug",
+            "german-laws::stpo::sec-100b-online-durchsuchung-part-03"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stpo_112_detention",
+          "query": "Wo stehen die Voraussetzungen der Untersuchungshaft?",
+          "expected_source_chunks": [
+            "german-laws::stpo::sec-112-voraussetzungen-der-untersuchungshaft-haftgrunde"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stpo::sec-112-voraussetzungen-der-untersuchungshaft-haftgrunde",
+            "german-laws::stpo::sec-114-haftbefehl",
+            "german-laws::stpo::sec-113-untersuchungshaft-bei-leichteren-taten",
+            "german-laws::stpo::sec-112-voraussetzungen-der-untersuchungshaft-haftgrunde-part-02",
+            "german-laws::stpo::sec-126-zustandigkeit-fur-weitere-gerichtliche-entscheidungen-part-02"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stpo_136_interrogation",
+          "query": "Welche Vorschrift regelt die Vernehmung des Beschuldigten?",
+          "expected_source_chunks": [
+            "german-laws::stpo::sec-136-vernehmung"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stpo::sec-163a-vernehmung-des-beschuldigten",
+            "german-laws::stpo::sec-136-vernehmung",
+            "german-laws::stpo::sec-135-sofortige-vernehmung",
+            "german-laws::stpo::sec-115-vorfuhrung-vor-den-zustandigen-richter",
+            "german-laws::stpo::sec-141a-vernehmungen-und-gegenuberstellungen-vor-der-bestellung-eines-pflichtverteidigers"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.5
+        },
+        {
+          "id": "zpo_253_complaint",
+          "query": "Wo regelt die ZPO die Klageschrift?",
+          "expected_source_chunks": [
+            "german-laws::zpo::sec-253-klageschrift"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::zpo::sec-253-klageschrift",
+            "german-laws::zpo::sec-879-zustandigkeit-fur-die-widerspruchsklage",
+            "german-laws::zpo::sec-805-klage-auf-vorzugsweise-befriedigung",
+            "german-laws::patg::sec-81",
+            "german-laws::vwgo::sec-81"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "hgb_1_merchant",
+          "query": "Wer ist Kaufmann im Sinne des HGB?",
+          "expected_source_chunks": [
+            "german-laws::hgb::sec-1"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::hgb::sec-1",
+            "german-laws::hgb::sec-17",
+            "german-laws::hgb::sec-347",
+            "german-laws::hgb::sec-344",
+            "german-laws::hgb::sec-362"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "hgb_238_accounting",
+          "query": "Welche Norm regelt die Buchführungspflicht des Kaufmanns?",
+          "expected_source_chunks": [
+            "german-laws::hgb::sec-238-buchfuhrungspflicht"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::hgb::sec-238-buchfuhrungspflicht",
+            "german-laws::ao_1977::sec-141-buchfuhrungspflicht-bestimmter-steuerpflichtiger",
+            "german-laws::hgb::sec-239-fuhrung-der-handelsbucher",
+            "german-laws::hgb::sec-242-pflicht-zur-aufstellung",
+            "german-laws::hgb::sec-347"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "inso_1_goals",
+          "query": "Welchem Zweck dient das Insolvenzverfahren?",
+          "expected_source_chunks": [
+            "german-laws::inso::sec-1-ziele-des-insolvenzverfahrens"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::inso::sec-1-ziele-des-insolvenzverfahrens",
+            "german-laws::inso::sec-35-begriff-der-insolvenzmasse",
+            "german-laws::inso::sec-38-begriff-der-insolvenzglaubiger",
+            "german-laws::inso::sec-2-amtsgericht-als-insolvenzgericht",
+            "german-laws::inso::sec-13-eroffnungsantrag"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "kschg_1_social_justification",
+          "query": "Wo steht der allgemeine Schutz gegen sozial ungerechtfertigte Kündigungen?",
+          "expected_source_chunks": [
+            "german-laws::kschg::sec-1-sozial-ungerechtfertigte-kundigungen"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::kschg::sec-1-sozial-ungerechtfertigte-kundigungen",
+            "german-laws::kschg::sec-13-auerordentliche-sittenwidrige-und-sonstige-kundigungen",
+            "german-laws::kschg::sec-1-sozial-ungerechtfertigte-kundigungen-part-02",
+            "german-laws::inso::sec-125-interessenausgleich-und-kundigungsschutz",
+            "german-laws::kschg::sec-4-anrufung-des-arbeitsgerichts"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "betrvg_1_works_council",
+          "query": "Ab wann werden Betriebsräte gewählt?",
+          "expected_source_chunks": [
+            "german-laws::betrvg::sec-1-errichtung-von-betriebsraten"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::betrvg::sec-13-zeitpunkt-der-betriebsratswahlen",
+            "german-laws::betrvg::sec-125-erstmalige-wahlen-nach-diesem-gesetz",
+            "german-laws::betrvg::sec-14a-vereinfachtes-wahlverfahren-fur-kleinbetriebe",
+            "german-laws::betrvg::sec-1-errichtung-von-betriebsraten",
+            "german-laws::betrvg::sec-8-wahlbarkeit"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.25
+        },
+        {
+          "id": "betrvg_87_codetermination",
+          "query": "Welche Vorschrift enthält die Mitbestimmungsrechte des Betriebsrats?",
+          "expected_source_chunks": [
+            "german-laws::betrvg::sec-87-mitbestimmungsrechte"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::betrvg::sec-87-mitbestimmungsrechte",
+            "german-laws::betrvg::sec-99-mitbestimmung-bei-personellen-einzelmanahmen",
+            "german-laws::betrvg::sec-91-mitbestimmungsrecht",
+            "german-laws::betrvg::sec-111-betriebsanderungen",
+            "german-laws::betrvg::sec-90-unterrichtungs-und-beratungsrechte"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gmbhg_5_share_capital",
+          "query": "Welche Norm regelt Stammkapital und Geschäftsanteil der GmbH?",
+          "expected_source_chunks": [
+            "german-laws::gmbhg::sec-5-stammkapital-geschaftsanteil"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gmbhg::sec-5-stammkapital-geschaftsanteil",
+            "german-laws::hgb::sec-315a-erganzende-vorschriften-fur-bestimmte-aktiengesellschaften-und-kommanditgesellschaften",
+            "german-laws::gmbhg::sec-5a-unternehmergesellschaft",
+            "german-laws::gmbhg::sec-55a-genehmigtes-kapital",
+            "german-laws::hgb::sec-289a-erganzende-vorgaben-fur-bestimmte-aktiengesellschaften-und-kommanditgesellschaften-auf"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "aktg_1_stock_corporation",
+          "query": "Welche Norm beschreibt das Wesen der Aktiengesellschaft?",
+          "expected_source_chunks": [
+            "german-laws::aktg::sec-1-wesen-der-aktiengesellschaft"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::aktg::sec-1-wesen-der-aktiengesellschaft",
+            "german-laws::hgb::sec-289f-erklarung-zur-unternehmensfuhrung-part-02",
+            "german-laws::hgb::sec-289f-erklarung-zur-unternehmensfuhrung",
+            "german-laws::aktg::sec-3-formkaufmann-borsennotierung",
+            "german-laws::hgb::sec-315a-erganzende-vorschriften-fur-bestimmte-aktiengesellschaften-und-kommanditgesellschaften"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "ao_1_scope",
+          "query": "Welche Norm beschreibt den Anwendungsbereich der Abgabenordnung?",
+          "expected_source_chunks": [
+            "german-laws::ao_1977::sec-1-anwendungsbereich"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::estg::sec-96-anwendung-der-abgabenordnung-allgemeine-vorschriften",
+            "german-laws::estg::sec-107-anwendung-der-abgabenordnung",
+            "german-laws::estg::sec-45b-angaben-zur-bescheinigung-und-abfuhrung-der-kapitalertragsteuer-part-08",
+            "german-laws::estg::sec-108-anwendung-von-straf-und-bugeldvorschriften-der-abgabenordnung",
+            "german-laws::ustg_1980::sec-28-zeitlich-begrenzte-fassungen-einzelner-gesetzesvorschriften"
+          ],
+          "hit": false,
+          "precision_at_k": 0.0,
+          "mrr": 0.0
+        },
+        {
+          "id": "estg_2_income_tax_scope",
+          "query": "Welche Norm regelt den Umfang der Besteuerung im Einkommensteuergesetz?",
+          "expected_source_chunks": [
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen",
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen-part-02",
+            "german-laws::estg::sec-32a-einkommensteuertarif",
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen-part-03",
+            "german-laws::estg::sec-51a-festsetzung-und-erhebung-von-zuschlagsteuern"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "sgb5_27_medical_treatment",
+          "query": "Welche SGB-V-Norm regelt Krankenbehandlung?",
+          "expected_source_chunks": [
+            "german-laws::sgb_5::sec-27-krankenbehandlung"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::sgb_5::inhaltsverzeichnis-part-17",
+            "german-laws::sgb_5::sec-92-richtlinien-des-gemeinsamen-bundesausschusses-part-02",
+            "german-laws::sgb_5::sec-115-dreiseitige-vertrage-und-rahmenempfehlungen-zwischen-krankenkassen-krankenhausern-und-ve",
+            "german-laws::sgb_5::sec-27-krankenbehandlung",
+            "german-laws::sgb_5::sec-112-zweiseitige-vertrage-und-rahmenempfehlungen-uber-krankenhausbehandlung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.25
+        },
+        {
+          "id": "urhg_2_protected_works",
+          "query": "Welche Vorschrift im Urheberrechtsgesetz nennt geschützte Werke?",
+          "expected_source_chunks": [
+            "german-laws::urhg::sec-2-geschutzte-werke"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::urhg::sec-2-geschutzte-werke",
+            "german-laws::urhg::sec-4-sammelwerke-und-datenbankwerke",
+            "german-laws::urhg::sec-61-verwaiste-werke",
+            "german-laws::urhg::sec-5-amtliche-werke",
+            "german-laws::urhg::sec-93-schutz-gegen-entstellung-namensnennung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "vwvfg_35_admin_act",
+          "query": "Wo steht der Begriff des Verwaltungsaktes?",
+          "expected_source_chunks": [
+            "german-laws::vwvfg::sec-35-begriff-des-verwaltungsaktes"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::vwvfg::sec-35-begriff-des-verwaltungsaktes",
+            "german-laws::ao_1977::sec-118-begriff-des-verwaltungsakts",
+            "german-laws::vwvfg::sec-9-begriff-des-verwaltungsverfahrens",
+            "german-laws::vwvfg::sec-44-nichtigkeit-des-verwaltungsaktes",
+            "german-laws::vwvfg::sec-43-wirksamkeit-des-verwaltungsaktes"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        }
+      ]
     },
     "hybrid": {
       "mode": "hybrid",
       "rerank": false,
       "summary": {
-        "completed_cases": 0,
+        "completed_cases": 44,
         "total_cases": 44,
-        "hit_rate": 0.0,
-        "mean_precision_at_k": 0.0,
-        "mean_mrr": 0.0
+        "hit_rate": 1.0,
+        "mean_precision_at_k": 0.2,
+        "mean_mrr": 0.9204545454545454
       },
-      "errors": [
-        "Qdrant unavailable: ResponseHandlingException: [Errno 61] Connection refused"
-      ],
-      "cases": []
+      "errors": [],
+      "cases": [
+        {
+          "id": "gg_art_1_human_dignity",
+          "query": "Welche Norm schützt die Menschenwürde im Grundgesetz?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-1"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-1",
+            "german-laws::gg::art-3",
+            "german-laws::gg::praambel",
+            "german-laws::gg::art-20a",
+            "german-laws::gg::art-79"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_2_free_development",
+          "query": "Wo steht das Recht auf freie Entfaltung der Persönlichkeit?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-2"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-2",
+            "german-laws::gg::art-5",
+            "german-laws::sgb_1::sec-1-aufgaben-des-sozialgesetzbuchs",
+            "german-laws::urhg::sec-19-vortrags-auffuhrungs-und-vorfuhrungsrecht",
+            "german-laws::betrvg::sec-75-grundsatze-fur-die-behandlung-der-betriebsangehorigen"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_3_equality",
+          "query": "Welche Grundgesetzregel sagt, dass alle Menschen vor dem Gesetz gleich sind?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-3"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-3",
+            "german-laws::gg::praambel",
+            "german-laws::gg::art-1",
+            "german-laws::gg::art-12",
+            "german-laws::gg::art-146"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_4_religion",
+          "query": "Welche Norm schützt Glaubens- und Gewissensfreiheit?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-4"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-4",
+            "german-laws::bbg_2009::sec-64-eidespflicht-eidesformel",
+            "german-laws::stgb::sec-166-beschimpfung-von-bekenntnissen-religionsgesellschaften-und-weltanschauungsvereinigungen",
+            "german-laws::gg::art-5",
+            "german-laws::gvg::sec-189"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_5_expression",
+          "query": "Wo ist die Meinungsfreiheit geregelt?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-5"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-18",
+            "german-laws::gg::art-126",
+            "german-laws::gg::art-93",
+            "german-laws::gg::art-5",
+            "german-laws::bgb::sec-1798-meinungsverschiedenheiten"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.25
+        },
+        {
+          "id": "gg_art_8_assembly",
+          "query": "Welche Vorschrift schützt friedliche Versammlungen ohne Waffen?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-8"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-8",
+            "german-laws::gg::art-26",
+            "german-laws::stgb::sec-130-volksverhetzung-part-02",
+            "german-laws::gg::art-4",
+            "german-laws::betrvg::sec-44-zeitpunkt-und-verdienstausfall"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_12_occupation",
+          "query": "Wo steht die Berufsfreiheit im Grundgesetz?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-12"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-12",
+            "german-laws::gg::grundgesetz-fur-die-bundesrepublik-deutschland-gg",
+            "german-laws::sgb_3::sec-27-versicherungsfreie-beschaftigte",
+            "german-laws::gg::eingangsformel",
+            "german-laws::sgb_5::sec-6-versicherungsfreiheit"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_14_property",
+          "query": "Welche Norm gewährleistet Eigentum und Erbrecht?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-14"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-14",
+            "german-laws::bgb::sec-2023-haftung-bei-rechtshangigkeit-nutzungen-und-verwendungen",
+            "german-laws::bgb::sec-2385-anwendung-auf-ahnliche-vertrage",
+            "german-laws::gg::art-74-part-02",
+            "german-laws::bbaug::sec-148-baumanahmen"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gg_art_20_democracy",
+          "query": "Welche Vorschrift beschreibt Deutschland als demokratischen und sozialen Bundesstaat?",
+          "expected_source_chunks": [
+            "german-laws::gg::art-20"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gg::art-20",
+            "german-laws::stgb::sec-92-begriffsbestimmungen",
+            "german-laws::gg::art-135a",
+            "german-laws::gg::art-135a-part-02",
+            "german-laws::gg::art-23"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_90_things",
+          "query": "Was sind Sachen im Sinne des BGB?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-90-begriff-der-sache"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-90-begriff-der-sache",
+            "german-laws::bgb::sec-92-verbrauchbare-sachen",
+            "german-laws::bgb::sec-91-vertretbare-sachen",
+            "german-laws::gg::art-73",
+            "german-laws::bgb::sec-1486-vorbehaltsgut-sondergut"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_104_incapacity",
+          "query": "Wo regelt das BGB die Geschäftsunfähigkeit?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-104-geschaftsunfahigkeit"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-104-geschaftsunfahigkeit",
+            "german-laws::bgb::sec-1304-geschaftsunfahigkeit",
+            "german-laws::bgb::sec-105a-geschafte-des-taglichen-lebens",
+            "german-laws::bgb::sec-730-auseinandersetzung-geschaftsfuhrung",
+            "german-laws::bgb::sec-1596-anerkennung-und-zustimmung-bei-fehlender-oder-beschrankter-geschaftsfahigkeit"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_145_offer_binding",
+          "query": "Welche Norm bindet den Antragenden an sein Vertragsangebot?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-145-bindung-an-den-antrag"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::sgb_5::sec-75b-richtlinie-zur-it-sicherheit-in-der-vertragsarztlichen-und-vertragszahnarztlichen-versor",
+            "german-laws::bgb::sec-145-bindung-an-den-antrag",
+            "german-laws::sgb_5::sec-127-vertrage-part-02",
+            "german-laws::bgb::sec-151-annahme-ohne-erklarung-gegenuber-dem-antragenden",
+            "german-laws::sgb_5::sec-111c-versorgungsvertrage-mit-rehabilitationseinrichtungen-verordnungsermachtigung-part-04"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.5
+        },
+        {
+          "id": "bgb_195_limitation",
+          "query": "Wie lautet die regelmäßige Verjährungsfrist im BGB?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-195-regelmaige-verjahrungsfrist"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-195-regelmaige-verjahrungsfrist",
+            "german-laws::bgb::sec-199-beginn-der-regelmaigen-verjahrungsfrist-und-verjahrungshochstfristen",
+            "german-laws::bgb::sec-197-dreiigjahrige-verjahrungsfrist",
+            "german-laws::bgb::sec-438-verjahrung-der-mangelanspruche",
+            "german-laws::bgb::sec-634a-verjahrung-der-mangelanspruche"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_242_good_faith",
+          "query": "Wo steht Leistung nach Treu und Glauben?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-242-leistung-nach-treu-und-glauben"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-242-leistung-nach-treu-und-glauben",
+            "german-laws::bgb::sec-275-ausschluss-der-leistungspflicht",
+            "german-laws::bgb::sec-320-einrede-des-nicht-erfullten-vertrags",
+            "german-laws::bgb::sec-162-verhinderung-oder-herbeifuhrung-des-bedingungseintritts",
+            "german-laws::bgb::sec-294-tatsachliches-angebot"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_280_damages",
+          "query": "Welche BGB-Norm regelt Schadensersatz wegen Pflichtverletzung?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-280-schadensersatz-wegen-pflichtverletzung"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-280-schadensersatz-wegen-pflichtverletzung",
+            "german-laws::bgb::sec-281-schadensersatz-statt-der-leistung-wegen-nicht-oder-nicht-wie-geschuldet-erbrachter-leist",
+            "german-laws::bgb::sec-282-schadensersatz-statt-der-leistung-wegen-verletzung-einer-pflicht-nach-sec-241-abs-2",
+            "german-laws::sgb_3::sec-321-schadensersatz",
+            "german-laws::bgb::sec-309-klauselverbote-ohne-wertungsmoglichkeit-part-02"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_311_obligations",
+          "query": "Welche Norm behandelt rechtsgeschäftliche und rechtsgeschäftsähnliche Schuldverhältnisse?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-311-rechtsgeschaftliche-und-rechtsgeschaftsahnliche-schuldverhaltnisse"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-311-rechtsgeschaftliche-und-rechtsgeschaftsahnliche-schuldverhaltnisse",
+            "german-laws::bgb::abschnitt-2-gestaltung-rechtsgeschaftlicher-schuldverhaltnisse-durch-allgemeine-geschaftsbedingu",
+            "german-laws::bgb::titel-8-dienstvertrag-und-ahnliche-vertrage",
+            "german-laws::bgb::sec-566c-vereinbarung-zwischen-mieter-und-vermieter-uber-die-miete",
+            "german-laws::zpo::sec-795-anwendung-der-allgemeinen-vorschriften-auf-die-weiteren-vollstreckungstitel"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_433_sale_contract",
+          "query": "Wo stehen die typischen Pflichten beim Kaufvertrag?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-433-vertragstypische-pflichten-beim-kaufvertrag"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-433-vertragstypische-pflichten-beim-kaufvertrag",
+            "german-laws::bgb::sec-443-garantie",
+            "german-laws::bgb::sec-454-zustandekommen-des-kaufvertrags",
+            "german-laws::bgb::sec-456-zustandekommen-des-wiederkaufs",
+            "german-laws::bgb::sec-631-vertragstypische-pflichten-beim-werkvertrag"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "bgb_434_defect",
+          "query": "Welche Vorschrift regelt den Sachmangel beim Kauf?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-434-sachmangel"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-475b-sachmangel-einer-ware-mit-digitalen-elementen",
+            "german-laws::bgb::sec-434-sachmangel",
+            "german-laws::bgb::sec-443-garantie",
+            "german-laws::bgb::sec-434-sachmangel-part-02",
+            "german-laws::bgb::sec-475c-sachmangel-einer-ware-mit-digitalen-elementen-bei-dauerhafter-bereitstellung-der-digita"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.5
+        },
+        {
+          "id": "bgb_823_tort",
+          "query": "Welche Norm regelt Schadensersatzpflicht bei Verletzung von Leben, Körper oder Eigentum?",
+          "expected_source_chunks": [
+            "german-laws::bgb::sec-823-schadensersatzpflicht"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-823-schadensersatzpflicht",
+            "german-laws::bgb::sec-309-klauselverbote-ohne-wertungsmoglichkeit-part-02",
+            "german-laws::stvg::sec-11-umfang-der-ersatzpflicht-bei-korperverletzung",
+            "german-laws::bbg_2009::sec-76-ubergang-eines-schadensersatzanspruchs-gegen-dritte",
+            "german-laws::bgb::sec-842-umfang-der-ersatzpflicht-bei-verletzung-einer-person"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_13_omission",
+          "query": "Wo regelt das StGB Begehen durch Unterlassen?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-13-begehen-durch-unterlassen"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-13-begehen-durch-unterlassen",
+            "german-laws::owig_1968::sec-8-begehen-durch-unterlassen",
+            "german-laws::stgb::sec-336-unterlassen-der-diensthandlung",
+            "german-laws::bbg_2009::sec-77-nichterfullung-von-pflichten",
+            "german-laws::stgb::sec-16-irrtum-uber-tatumstande"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_15_intent_negligence",
+          "query": "Welche Vorschrift unterscheidet vorsätzliches und fahrlässiges Handeln?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-15-vorsatzliches-und-fahrlassiges-handeln"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-15-vorsatzliches-und-fahrlassiges-handeln",
+            "german-laws::owig_1968::sec-10-vorsatz-und-fahrlassigkeit",
+            "german-laws::owig_1968::sec-11-irrtum",
+            "german-laws::stgb::sec-16-irrtum-uber-tatumstande",
+            "german-laws::stvg::sec-24-bugeldvorschriften"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_16_mistake",
+          "query": "Wo steht der Irrtum über Tatumstände?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-16-irrtum-uber-tatumstande"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-16-irrtum-uber-tatumstande",
+            "german-laws::owig_1968::sec-11-irrtum",
+            "german-laws::bgb::sec-1949-irrtum-uber-den-berufungsgrund",
+            "german-laws::bgb::sec-686-irrtum-uber-person-des-geschaftsherrn",
+            "german-laws::bgb::sec-2078-anfechtung-wegen-irrtums-oder-drohung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_32_self_defense",
+          "query": "Welche Norm regelt Notwehr?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-32-notwehr"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::bgb::sec-227-notwehr",
+            "german-laws::stgb::sec-32-notwehr",
+            "german-laws::owig_1968::sec-15-notwehr",
+            "german-laws::stgb::sec-33-uberschreitung-der-notwehr",
+            "german-laws::stgb::sec-34-rechtfertigender-notstand"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.5
+        },
+        {
+          "id": "stgb_123_trespass",
+          "query": "Welche Strafnorm behandelt Hausfriedensbruch?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-123-hausfriedensbruch"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-123-hausfriedensbruch",
+            "german-laws::stgb::sec-124-schwerer-hausfriedensbruch",
+            "german-laws::owig_1968::sec-112-verletzung-der-hausordnung-eines-gesetzgebungsorgans",
+            "german-laws::stpo::sec-374-zulassigkeit-privatklageberechtigte",
+            "german-laws::stgb::sec-125-landfriedensbruch"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_211_murder",
+          "query": "Wo steht Mord im StGB?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-211-mord"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-211-mord",
+            "german-laws::gvg::sec-74-part-02",
+            "german-laws::stgb::sec-294-strafantrag",
+            "german-laws::gvg::sec-74-part-03",
+            "german-laws::stgb::sec-78-verjahrungsfrist"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_223_bodily_harm",
+          "query": "Welche Norm regelt Körperverletzung?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-223-korperverletzung"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-223-korperverletzung",
+            "german-laws::stgb::sec-229-fahrlassige-korperverletzung",
+            "german-laws::stgb::sec-224-gefahrliche-korperverletzung",
+            "german-laws::stgb::sec-227-korperverletzung-mit-todesfolge",
+            "german-laws::stgb::sec-340-korperverletzung-im-amt"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_242_theft",
+          "query": "Welche Strafnorm regelt Diebstahl?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-242-diebstahl"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-242-diebstahl",
+            "german-laws::stgb::sec-244-diebstahl-mit-waffen-bandendiebstahl-wohnungseinbruchdiebstahl",
+            "german-laws::stgb::sec-252-rauberischer-diebstahl",
+            "german-laws::stgb::sec-243-besonders-schwerer-fall-des-diebstahls",
+            "german-laws::stgb::sec-244a-schwerer-bandendiebstahl"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stgb_263_fraud",
+          "query": "Welche Vorschrift regelt Betrug?",
+          "expected_source_chunks": [
+            "german-laws::stgb::sec-263-betrug"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stgb::sec-263-betrug-part-02",
+            "german-laws::stgb::sec-263-betrug",
+            "german-laws::inso::sec-3a-gruppen-gerichtsstand",
+            "german-laws::stgb::sec-265b-kreditbetrug",
+            "german-laws::stgb::sec-265a-erschleichen-von-leistungen"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.5
+        },
+        {
+          "id": "stpo_112_detention",
+          "query": "Wo stehen die Voraussetzungen der Untersuchungshaft?",
+          "expected_source_chunks": [
+            "german-laws::stpo::sec-112-voraussetzungen-der-untersuchungshaft-haftgrunde"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stpo::sec-112-voraussetzungen-der-untersuchungshaft-haftgrunde",
+            "german-laws::stpo::sec-112-voraussetzungen-der-untersuchungshaft-haftgrunde-part-02",
+            "german-laws::stpo::sec-113-untersuchungshaft-bei-leichteren-taten",
+            "german-laws::stpo::sec-122-besondere-haftprufung-durch-das-oberlandesgericht",
+            "german-laws::stpo::sec-126-zustandigkeit-fur-weitere-gerichtliche-entscheidungen-part-02"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "stpo_136_interrogation",
+          "query": "Welche Vorschrift regelt die Vernehmung des Beschuldigten?",
+          "expected_source_chunks": [
+            "german-laws::stpo::sec-136-vernehmung"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::stpo::sec-136-vernehmung",
+            "german-laws::stpo::sec-135-sofortige-vernehmung",
+            "german-laws::stpo::sec-163a-vernehmung-des-beschuldigten",
+            "german-laws::stpo::sec-141a-vernehmungen-und-gegenuberstellungen-vor-der-bestellung-eines-pflichtverteidigers",
+            "german-laws::stpo::sec-136-vernehmung-part-02"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "zpo_253_complaint",
+          "query": "Wo regelt die ZPO die Klageschrift?",
+          "expected_source_chunks": [
+            "german-laws::zpo::sec-253-klageschrift"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::zpo::sec-253-klageschrift",
+            "german-laws::zpo::sec-587-klageschrift",
+            "german-laws::zpo::sec-271-zustellung-der-klageschrift",
+            "german-laws::zpo::sec-317-urteilszustellung-und-ausfertigung-part-02",
+            "german-laws::arbgg::sec-47-sondervorschriften-uber-ladung-und-einlassung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "hgb_1_merchant",
+          "query": "Wer ist Kaufmann im Sinne des HGB?",
+          "expected_source_chunks": [
+            "german-laws::hgb::sec-1"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::hgb::sec-1",
+            "german-laws::hgb::sec-17",
+            "german-laws::hgb::sec-362",
+            "german-laws::hgb::sec-344",
+            "german-laws::hgb::sec-347"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "hgb_238_accounting",
+          "query": "Welche Norm regelt die Buchführungspflicht des Kaufmanns?",
+          "expected_source_chunks": [
+            "german-laws::hgb::sec-238-buchfuhrungspflicht"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::hgb::sec-238-buchfuhrungspflicht",
+            "german-laws::ao_1977::sec-141-buchfuhrungspflicht-bestimmter-steuerpflichtiger",
+            "german-laws::hgb::sec-239-fuhrung-der-handelsbucher",
+            "german-laws::ao_1977::sec-141-buchfuhrungspflicht-bestimmter-steuerpflichtiger-part-02",
+            "german-laws::aktg::sec-91-organisation-buchfuhrung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "inso_1_goals",
+          "query": "Welchem Zweck dient das Insolvenzverfahren?",
+          "expected_source_chunks": [
+            "german-laws::inso::sec-1-ziele-des-insolvenzverfahrens"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::inso::sec-1-ziele-des-insolvenzverfahrens",
+            "german-laws::zpo::sec-240-unterbrechung-durch-insolvenzverfahren",
+            "german-laws::inso::sec-35-begriff-der-insolvenzmasse",
+            "german-laws::inso::sec-11-zulassigkeit-des-insolvenzverfahrens",
+            "german-laws::stpo::sec-111i-insolvenzverfahren"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "kschg_1_social_justification",
+          "query": "Wo steht der allgemeine Schutz gegen sozial ungerechtfertigte Kündigungen?",
+          "expected_source_chunks": [
+            "german-laws::kschg::sec-1-sozial-ungerechtfertigte-kundigungen"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::kschg::sec-1-sozial-ungerechtfertigte-kundigungen",
+            "german-laws::kschg::sec-1-sozial-ungerechtfertigte-kundigungen-part-02",
+            "german-laws::kschg::sec-1-sozial-ungerechtfertigte-kundigungen-part-03",
+            "german-laws::kschg::sec-4-anrufung-des-arbeitsgerichts",
+            "german-laws::kschg::sec-13-auerordentliche-sittenwidrige-und-sonstige-kundigungen"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "betrvg_1_works_council",
+          "query": "Ab wann werden Betriebsräte gewählt?",
+          "expected_source_chunks": [
+            "german-laws::betrvg::sec-1-errichtung-von-betriebsraten"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::betrvg::sec-1-errichtung-von-betriebsraten",
+            "german-laws::betrvg::sec-14a-vereinfachtes-wahlverfahren-fur-kleinbetriebe",
+            "german-laws::betrvg::sec-9-zahl-der-betriebsratsmitglieder-part-02",
+            "german-laws::betrvg::sec-21-amtszeit",
+            "german-laws::betrvg::sec-27-betriebsausschuss"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "betrvg_87_codetermination",
+          "query": "Welche Vorschrift enthält die Mitbestimmungsrechte des Betriebsrats?",
+          "expected_source_chunks": [
+            "german-laws::betrvg::sec-87-mitbestimmungsrechte"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::betrvg::sec-87-mitbestimmungsrechte",
+            "german-laws::betrvg::sec-99-mitbestimmung-bei-personellen-einzelmanahmen",
+            "german-laws::betrvg::sec-91-mitbestimmungsrecht",
+            "german-laws::betrvg::sec-86a-vorschlagsrecht-der-arbeitnehmer",
+            "german-laws::betrvg::sec-102-mitbestimmung-bei-kundigungen"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "gmbhg_5_share_capital",
+          "query": "Welche Norm regelt Stammkapital und Geschäftsanteil der GmbH?",
+          "expected_source_chunks": [
+            "german-laws::gmbhg::sec-5-stammkapital-geschaftsanteil"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::gmbhg::sec-5-stammkapital-geschaftsanteil",
+            "german-laws::gmbhg::sec-57n-gewinnbeteiligung-der-neuen-geschaftsanteile",
+            "german-laws::gmbhg::sec-55-erhohung-des-stammkapitals",
+            "german-laws::gmbhg::sec-55a-genehmigtes-kapital",
+            "german-laws::gmbhg::sec-58a-vereinfachte-kapitalherabsetzung"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "aktg_1_stock_corporation",
+          "query": "Welche Norm beschreibt das Wesen der Aktiengesellschaft?",
+          "expected_source_chunks": [
+            "german-laws::aktg::sec-1-wesen-der-aktiengesellschaft"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::aktg::sec-1-wesen-der-aktiengesellschaft",
+            "german-laws::hgb::sec-289f-erklarung-zur-unternehmensfuhrung-part-02",
+            "german-laws::hgb::sec-289f-erklarung-zur-unternehmensfuhrung-part-03",
+            "german-laws::hgb::sec-289a-erganzende-vorgaben-fur-bestimmte-aktiengesellschaften-und-kommanditgesellschaften-auf",
+            "german-laws::hgb::sec-315a-erganzende-vorschriften-fur-bestimmte-aktiengesellschaften-und-kommanditgesellschaften"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "ao_1_scope",
+          "query": "Welche Norm beschreibt den Anwendungsbereich der Abgabenordnung?",
+          "expected_source_chunks": [
+            "german-laws::ao_1977::sec-1-anwendungsbereich"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::estg::sec-107-anwendung-der-abgabenordnung",
+            "german-laws::estg::sec-96-anwendung-der-abgabenordnung-allgemeine-vorschriften",
+            "german-laws::estg::sec-108-anwendung-von-straf-und-bugeldvorschriften-der-abgabenordnung",
+            "german-laws::ao_1977::sec-1-anwendungsbereich",
+            "german-laws::ao_1977::sec-2a-anwendungsbereich-der-vorschriften-uber-die-verarbeitung-personenbezogener-daten"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 0.25
+        },
+        {
+          "id": "estg_2_income_tax_scope",
+          "query": "Welche Norm regelt den Umfang der Besteuerung im Einkommensteuergesetz?",
+          "expected_source_chunks": [
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen",
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen-part-02",
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen-part-03",
+            "german-laws::estg::sec-2-umfang-der-besteuerung-begriffsbestimmungen-part-04",
+            "german-laws::estg::sec-46-veranlagung-bei-bezug-von-einkunften-aus-nichtselbstandiger-arbeit-part-05"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "sgb5_27_medical_treatment",
+          "query": "Welche SGB-V-Norm regelt Krankenbehandlung?",
+          "expected_source_chunks": [
+            "german-laws::sgb_5::sec-27-krankenbehandlung"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::sgb_5::sec-27-krankenbehandlung",
+            "german-laws::sgb_5::sec-264-ubernahme-der-krankenbehandlung-fur-nicht-versicherungspflichtige-gegen-kostenerstattung-part-02",
+            "german-laws::sgb_5::sec-27-krankenbehandlung-part-02",
+            "german-laws::sgb_5::sec-35b-kosten-nutzen-bewertung-von-arzneimitteln",
+            "german-laws::sgb_5::inhaltsverzeichnis-part-17"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "urhg_2_protected_works",
+          "query": "Welche Vorschrift im Urheberrechtsgesetz nennt geschützte Werke?",
+          "expected_source_chunks": [
+            "german-laws::urhg::sec-2-geschutzte-werke"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::urhg::sec-2-geschutzte-werke",
+            "german-laws::urhg::sec-95a-schutz-technischer-manahmen",
+            "german-laws::urhg::sec-129-werke",
+            "german-laws::urhg::sec-3-bearbeitungen",
+            "german-laws::urhg::sec-4-sammelwerke-und-datenbankwerke"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        },
+        {
+          "id": "vwvfg_35_admin_act",
+          "query": "Wo steht der Begriff des Verwaltungsaktes?",
+          "expected_source_chunks": [
+            "german-laws::vwvfg::sec-35-begriff-des-verwaltungsaktes"
+          ],
+          "retrieved_source_chunks": [
+            "german-laws::vwvfg::sec-35-begriff-des-verwaltungsaktes",
+            "german-laws::ao_1977::sec-118-begriff-des-verwaltungsakts",
+            "german-laws::vwvfg::sec-9-begriff-des-verwaltungsverfahrens",
+            "german-laws::vwvfg::sec-43-wirksamkeit-des-verwaltungsaktes",
+            "german-laws::vwvfg::sec-44-nichtigkeit-des-verwaltungsaktes"
+          ],
+          "hit": true,
+          "precision_at_k": 0.2,
+          "mrr": 1.0
+        }
+      ]
     }
   }
 }
