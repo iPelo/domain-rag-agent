@@ -10,7 +10,7 @@
 
 ## The Problem
 
-Generative models can drift when asked about specific documents. Naive RAG (chunk + embed + retrieve + stuff) helps but has a lot of failure modes that almost no one in a portfolio bothers to measure. This project builds a real RAG service for **one specific domain** and rigorously evaluates each architectural choice.
+Generative models can drift when asked about specific documents. Naive RAG (chunk + embed + retrieve + stuff) helps but has a lot of failure modes that almost no one in a portfolio bothers to measure. This project builds a real RAG + agent system for **one specific domain** and rigorously evaluates each architectural choice.
 
 The differentiator on your portfolio is **not the chatbot** — it's the evaluation harness and the engineering decisions you can defend.
 
@@ -80,9 +80,10 @@ Why this matters: a generic "chat with PDFs" project signals nothing. A focused,
 - [ ] Try 3 chunking strategies (fixed, recursive, semantic) and **document trade-offs**
 
 ### Phase 3 — Generation + Agent (Week 3)
-- [ ] Stuff top-k chunks into a generation prompt
-- [ ] Force model to cite chunk IDs in every answer
+- [x] Stuff top-k chunks into a generation prompt
+- [x] Force model to cite chunk IDs in every answer
 - [ ] Agent loop: model can call `retrieve(query)` multiple times before answering
+  - [x] Wire the `retrieve` tool to the retrieval service
 - [ ] Add a second tool (calculator, date math, or web search)
 
 ### Phase 4 — Evaluation ⭐ THE PART THAT MAKES THIS A PORTFOLIO PROJECT (Week 4)

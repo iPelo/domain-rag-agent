@@ -1,7 +1,7 @@
 [project]
 name = "domain-rag-agent"
 version = "0.1.0"
-description = "GermanLawRAG: retrieval-augmented assistant for German legal texts."
+description = "GermanLawRAG: retrieval service for German legal texts."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -45,5 +45,5 @@ strict = true
 files = ["backend/app"]
 
 [[tool.mypy.overrides]]
-module = ["bs4.*", "qdrant_client.*", "rank_bm25.*"]
+module = ["bs4.*", "qdrant_client.*", "rank_bm25.*", "sentence_transformers.*"]
 ignore_missing_imports = true

@@ -10,7 +10,8 @@ The project is built around one focused domain:
 
 ## Current Status
 
-Project structure is ready and the ingestion pipeline understands the local `data/raw/german-laws` clone.
+Project structure, ingestion, curated indexing, hybrid retrieval, and grounded answer
+generation are in place for the local `data/raw/german-laws` clone.
 
 ## Architecture
 
@@ -29,6 +30,7 @@ Project structure is ready and the ingestion pipeline understands the local `dat
         |-- BM25 retrieval
         |-- hybrid fusion
         |-- reranking
+        |-- grounded answer generation
         |-- agent tools
         |-- evaluation harness
         |
@@ -117,6 +119,33 @@ For a quick parser check:
 uv run python scripts/build_chunks.py --raw-dir data/raw/german-laws --limit 5
 ```
 
+7. Build the first Qdrant retrieval index:
+
+```bash
+make up
+make index
+```
+
+`make index` embeds the curated subset of major German codes for development.
+Use `make index-all` only when you want to embed the full corpus.
+
+8. Configure answer generation:
+
+```bash
+MODEL_PROVIDER=hosted
+MODEL_NAME=<model-name>
+MODEL_BASE_URL=<chat-completions-base-url>
+MODEL_API_KEY=<your-key>
+```
+
+Then call:
+
+```bash
+curl -X POST http://localhost:8000/answer \
+  -H "Content-Type: application/json" \
+  -d '{"query":"Wo ist die Meinungsfreiheit geregelt?","top_k":5}'
+```
+
 ## VS Code
 
 This repo includes `.vscode/` settings for Python, Ruff, pytest, and a FastAPI launch configuration.
@@ -132,6 +161,7 @@ Recommended workflow:
 
 1. Keep the cloned `german-laws` data at `data/raw/german-laws/`.
 2. Build normalized documents and legal-heading chunks.
-3. Add embeddings for `data/processed/chunks.jsonl`.
-4. Store embedded chunks in Qdrant.
-5. Build the first 10 hand-written evaluation queries.
+3. Build or refresh the curated Qdrant index with `make index`.
+4. Test `/index/stats` and `/retrieve`.
+5. Add the multi-step agent loop on top of the wired retrieval tool.
+6. Expand the smoke queries into a larger golden evaluation set.
