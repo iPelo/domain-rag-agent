@@ -17,6 +17,10 @@ from collections.abc import Sequence
 from typing import Any
 
 
+# The final, most accurate ranking stage. A cross-encoder reads the
+# query and a chunk TOGETHER and scores their relevance directly —
+# sharper than dense/BM25, but too slow to run over the whole corpus,
+# so it only re-sorts the small candidate pool from earlier stages.
 class CrossEncoderReranker:
     def __init__(
         self,
@@ -34,6 +38,8 @@ class CrossEncoderReranker:
     def model_name(self) -> str:
         return self._model_name
 
+    # Lazy loader — the reranker weights (~2GB) load on first use only, so
+    # retrieval without rerank=true (and the whole test suite) pays nothing.
     def _ensure_model(self) -> Any:
         if self._model is None:
             from sentence_transformers import CrossEncoder
@@ -41,6 +47,9 @@ class CrossEncoderReranker:
             self._model = CrossEncoder(self._model_name, device=self._device)
         return self._model
 
+    # Re-score (chunk_id, text) candidates against the query
+    # and return the best top_k. Empty input short-circuits,
+    # which also avoids triggering the lazy model load.
     def rerank(
         self,
         query: str,

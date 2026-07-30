@@ -11,6 +11,10 @@ from app.retrieval.rrf import reciprocal_rank_fusion
 from app.retrieval.store import ChunkStore
 
 
+# Unit tests for the retrieval building blocks (tokenizer, BM25,
+# RRF, ChunkStore, ids). They avoid Qdrant and the ML models
+# entirely, so they're fast and deterministic. _chunk() is a tiny
+# factory that builds a throwaway IndexedChunk for the tests below.
 def _chunk(chunk_id: str, text: str, law: str = "GG") -> IndexedChunk:
     return IndexedChunk(
         chunk_id=chunk_id,
@@ -128,6 +132,9 @@ def test_chunk_store_missing_file_raises(tmp_path) -> None:
 # -- dense point ids ----------------------------------------------------------
 
 
+# Confirms the chunk_id -> UUID mapping is stable (same id -> same point, so
+# re-indexing overwrites instead of duplicating) and collision-free across different
+# ids.
 def test_point_id_is_deterministic_and_unique() -> None:
     assert point_id_for("german-laws::gg::art-5") == point_id_for("german-laws::gg::art-5")
     assert point_id_for("german-laws::gg::art-5") != point_id_for("german-laws::gg::art-6")
@@ -136,6 +143,9 @@ def test_point_id_is_deterministic_and_unique() -> None:
 # -- model wrappers are lazy --------------------------------------------------
 
 
+# Guards the lazy-loading promise: encoding empty input must
+# NOT pull in the heavy weights. It checks the private _model
+# is still None — a deliberate peek to assert nothing loaded.
 def test_embedding_model_does_not_load_for_empty_input() -> None:
     model = EmbeddingModel("BAAI/bge-m3")
     assert model.encode([]) == []

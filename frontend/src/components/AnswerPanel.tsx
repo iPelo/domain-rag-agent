@@ -4,6 +4,8 @@ interface AnswerPanelProps {
   answer: AnswerResponse;
 }
 
+// Presentational component for an /answer result: shows the answer text and a
+// list of citation links. Pure UI — it just renders the props App.tsx passes in.
 export function AnswerPanel({ answer }: AnswerPanelProps) {
   return (
     <section className="answer-panel">

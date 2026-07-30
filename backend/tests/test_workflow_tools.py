@@ -5,6 +5,10 @@ from app.retrieval.service import RetrievalService
 from app.workflow.tools import RetrievalTool
 
 
+# Tests for RetrievalTool. FakeRetrievalService is a stand-in that
+# records how it was called and returns canned results — so the
+# tests assert the tool forwards the RIGHT arguments, without
+# needing a real index. `cast(...)` only satisfies the type checker.
 class FakeRetrievalService:
     def __init__(self, results: list[ScoredChunk]) -> None:
         self.results = results
@@ -52,6 +56,8 @@ def test_retrieval_tool_calls_retrieval_service_with_defaults() -> None:
     assert chunks[0].method == "hybrid"
 
 
+# Verifies per-call arguments override the tool's
+# stored defaults (the recorded call proves it).
 def test_retrieval_tool_allows_call_level_overrides() -> None:
     fake_service = FakeRetrievalService([_scored_chunk()])
     tool = RetrievalTool(

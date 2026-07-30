@@ -27,6 +27,9 @@ CHUNK_SIZE = 1600
 OVERLAP = 180
 
 
+# Benchmark the three chunking strategies on the same sample
+# laws and size budget, so the only variable is the boundary
+# logic. Prints a stats table that feeds docs/decisions.md.
 def main() -> None:
     from app.ingestion.chunking import chunk_document
     from app.ingestion.loaders import load_local_documents
@@ -72,6 +75,9 @@ def main() -> None:
     _print_table(rows)
 
 
+# Heuristic quality signal: a chunk that begins lowercase was probably cut
+# mid-sentence. A lower "mid-sentence start %" means cleaner, more readable
+# boundaries.
 def _starts_mid_sentence(text: str) -> bool:
     """A chunk whose first letter is lowercase was almost certainly cut mid-sentence."""
     for char in text.lstrip():

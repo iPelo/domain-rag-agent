@@ -37,7 +37,7 @@ answers from retrieved chunks.
         |-- evaluation harness
         |
         v
-[ Next.js frontend ]
+[ React + Vite frontend ]
 ```
 
 ## Repository Layout
@@ -148,6 +148,20 @@ curl -X POST http://localhost:8000/answer \
   -d '{"query":"Wo ist die Meinungsfreiheit geregelt?","top_k":5}'
 ```
 
+The model settings are optional. Retrieval works without them, while `/answer`
+returns a clear `503` until they are configured.
+
+## Verification
+
+Run every local check with one command:
+
+```bash
+make verify
+```
+
+This runs the backend tests, Ruff, mypy, TypeScript checks, and the frontend
+production build.
+
 ## VS Code
 
 This repo includes `.vscode/` settings for Python, Ruff, pytest, and a FastAPI launch configuration.
@@ -164,11 +178,16 @@ Useful tasks:
 - `GermanLawRAG: Build Retrieval Index`: starts Qdrant and rebuilds the curated index.
 - `GermanLawRAG: Run Retrieval Evaluation`: runs the golden-set retrieval report.
 
-## Next Milestones
+## Current Evaluation
 
-1. Keep the cloned `german-laws` data at `data/raw/german-laws/`.
-2. Build normalized documents and legal-heading chunks.
-3. Build or refresh the curated Qdrant index with `make index`.
-4. Test `/index/stats` and `/retrieve`.
-5. Expand `/answer` coverage with more citation-focused tests.
-6. Grow the smoke queries into a larger golden evaluation set.
+The golden set contains 44 questions. The latest recorded top-5 retrieval
+results are:
+
+| Mode | Hit rate | Mean MRR |
+|---|---:|---:|
+| BM25 | 0.886 | 0.777 |
+| Dense | 0.977 | 0.883 |
+| Hybrid | 1.000 | 0.920 |
+
+The next meaningful improvement is answer-quality evaluation with a configured
+chat model. Retrieval evaluation and the main application flow are implemented.

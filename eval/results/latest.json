@@ -1,5 +1,5 @@
 {
-  "run_id": "20260602T175703Z",
+  "run_id": "20260730T221110Z",
   "golden_set": "eval/golden_set.jsonl",
   "case_count": 44,
   "top_k": 5,

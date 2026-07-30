@@ -19,6 +19,10 @@ interface ControlsProps {
   onSubmit: () => void;
 }
 
+// The query form. It's "controlled" — it holds no state of its own;
+// every field reads from `form` and reports edits up via onChange,
+// so App.tsx stays the single source of truth. canSubmit gates the
+// button (needs >=2 chars, not loading); ⌘/Ctrl+Enter also submits.
 export function Controls({ form, loading, onChange, onSubmit }: ControlsProps) {
   const maxTopK = form.action === "answer" ? 20 : 50;
   const canSubmit = form.query.trim().length >= 2 && !loading;

@@ -8,6 +8,9 @@ interface ChunkCardProps {
 
 const COLLAPSE_LENGTH = 360;
 
+// One retrieved chunk as a card. Long text collapses behind
+// a "Show more" toggle; the local `expanded` state is fine
+// here because it's purely view state, not shared data.
 export function ChunkCard({ chunk, rank }: ChunkCardProps) {
   const isLong = chunk.text.length > COLLAPSE_LENGTH;
   const [expanded, setExpanded] = useState(false);

@@ -6,6 +6,11 @@ SUPPORTED_EXTENSIONS = {".html", ".htm", ".xml", ".txt", ".md"}
 GERMAN_LAWS_DATASET = "bundestag/gesetze"
 
 
+# Stage 1 of ingestion: walk the raw data folder and turn each supported
+# file into a RawDocument. Receives the raw directory; returns one
+# RawDocument per readable file. Special handling: inside the
+# german-laws corpus only each law's `index.md` is read (the rest are
+# skipped), hidden/dot files are ignored, and empty files are dropped.
 def load_local_documents(raw_dir: Path) -> list[RawDocument]:
     documents: list[RawDocument] = []
     for path in sorted(raw_dir.rglob("*")):
@@ -38,6 +43,10 @@ def load_local_documents(raw_dir: Path) -> list[RawDocument]:
     return documents
 
 
+# Parse one German-law markdown file. Pulls structured fields out of
+# the YAML-style frontmatter (jurabk -> law_code like "BGB"; slug ->
+# source_url) and uses the first markdown heading as the title. All
+# of this lands in metadata for later retrieval + citation.
 def _read_german_law_markdown(path: Path, raw_dir: Path) -> RawDocument:
     raw = path.read_text(encoding="utf-8", errors="replace")
     frontmatter, body = _split_frontmatter(raw)
@@ -64,6 +73,8 @@ def _read_german_law_markdown(path: Path, raw_dir: Path) -> RawDocument:
     )
 
 
+# Split a leading "---"-delimited frontmatter header from the document body. Returns
+# (metadata dict, body). If there is no leading "---" block, metadata is empty.
 def _split_frontmatter(raw: str) -> tuple[dict[str, str], str]:
     lines = raw.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -76,6 +87,9 @@ def _split_frontmatter(raw: str) -> tuple[dict[str, str], str]:
     return {}, raw
 
 
+# Turn "key: value" frontmatter lines into a dict. Indented
+# continuation lines are appended to the previous key, so a
+# value wrapped across two lines is joined back together.
 def _parse_frontmatter(lines: list[str]) -> dict[str, str]:
     metadata: dict[str, str] = {}
     current_key: str | None = None
@@ -106,6 +120,9 @@ def _is_inside_german_laws_repo(path: Path) -> bool:
     return "german-laws" in path.parts
 
 
+# Read a non-markdown file into (text, title). HTML/XML are parsed with
+# BeautifulSoup to strip tags; plain text uses its first non-empty line as a rough
+# title.
 def _read_text(path: Path) -> tuple[str, str | None]:
     raw = path.read_text(encoding="utf-8", errors="replace")
     if path.suffix.lower() in {".html", ".htm", ".xml"}:
@@ -119,6 +136,8 @@ def _read_text(path: Path) -> tuple[str, str | None]:
     return raw, first_line
 
 
+# Build a stable id from the file's path relative to the raw dir (slashes ->
+# "::"), so the same file always yields the same source_id across rebuilds.
 def _source_id(path: Path, raw_dir: Path) -> str:
     relative = path.relative_to(raw_dir)
     return relative.with_suffix("").as_posix().replace("/", "::")

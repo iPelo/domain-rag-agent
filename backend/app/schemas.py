@@ -10,6 +10,10 @@ from app.retrieval.models import ScoredChunk
 from app.retrieval.service import IndexStats, RetrievalMode
 
 
+# This file defines the JSON shapes the API sends and receives (Pydantic models).
+# They are the public contract: FastAPI validates incoming bodies against them and
+# serializes outgoing ones from them. The frontend's types in api.ts mirror these.
+# Each `from_*` classmethod adapts an internal dataclass into its API model.
 class RetrievedChunk(BaseModel):
     chunk_id: str
     citation: str = Field(description="Human-readable source, e.g. 'GG Art 5'.")
@@ -21,6 +25,9 @@ class RetrievedChunk(BaseModel):
     method: str = Field(description="Retrieval stage that produced this result.")
     text: str
 
+    # Adapter: turn an internal ScoredChunk (a retrieval
+    # result) into the API shape, rounding the score for a tidy
+    # response. Keeps internal types out of the API layer.
     @classmethod
     def from_scored_chunk(cls, scored: ScoredChunk) -> RetrievedChunk:
         chunk = scored.chunk
@@ -46,6 +53,9 @@ class RetrieveResponse(BaseModel):
     results: list[RetrievedChunk]
 
 
+# The POST /answer body. Field(...) sets validation + docs:
+# e.g. top_k is capped at 1..20 here (stricter than /retrieve's
+# 1..50) because answering over many chunks is costly.
 class AnswerRequest(BaseModel):
     query: str = Field(min_length=2, description="Question to answer from retrieved sources.")
     mode: RetrievalMode = Field(default="hybrid", description="Retrieval strategy.")
@@ -72,6 +82,9 @@ class AnswerCitation(BaseModel):
         )
 
 
+# The /answer reply: the answer text, the validated
+# citations, AND the full source chunks behind it — so the UI
+# can show citations and let the user inspect the evidence.
 class AnswerResponse(BaseModel):
     query: str
     answer: str
@@ -94,6 +107,8 @@ class AnswerResponse(BaseModel):
         )
 
 
+# The /index/stats reply — mirrors the internal
+# IndexStats dataclass for the UI status bar.
 class IndexStatsResponse(BaseModel):
     collection: str
     collection_ready: bool

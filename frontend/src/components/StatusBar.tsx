@@ -6,6 +6,9 @@ interface StatusBarProps {
   error: string | null;
 }
 
+// The header status line. Derives a colored dot + label from
+// health/stats/error: down (unreachable), warn (up but index
+// not built), or up (ready), plus quick index numbers.
 export function StatusBar({ health, stats, error }: StatusBarProps) {
   let dotClass = "status-dot status-dot--unknown";
   let label = "Connecting to backend…";

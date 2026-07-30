@@ -25,6 +25,9 @@ sys.path.insert(0, str(ROOT_DIR / "backend"))
 DEFAULT_QUERIES = ROOT_DIR / "eval" / "example_queries.jsonl"
 
 
+# A quick, informal sanity check (not the formal eval): run each
+# hand-written query and print the top hits, flagging whether
+# the expected law/section showed up. Needs Qdrant + index.
 def main() -> None:
     from app.config import get_settings
     from app.retrieval.service import RETRIEVAL_MODES, RetrievalService
@@ -76,6 +79,8 @@ def _load_queries(path: Path) -> list[dict]:
     return cases
 
 
+# Did this chunk meet a query's loose expectation? Right law_code,
+# and (if given) the expected section string appears in the citation.
 def _matches(chunk: object, case: dict) -> bool:
     law = getattr(chunk, "law_code", "")
     citation = getattr(chunk, "citation", "")

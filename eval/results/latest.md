@@ -1,6 +1,6 @@
 # Retrieval Evaluation
 
-- Run: `20260602T175703Z`
+- Run: `20260730T221110Z`
 - Golden set: `eval/golden_set.jsonl`
 - Cases: 44
 - Top-k: 5

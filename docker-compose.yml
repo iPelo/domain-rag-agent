@@ -1,3 +1,4 @@
+# Local vector database. Data persists across container restarts.
 services:
   qdrant:
     image: qdrant/qdrant:v1.18.0
@@ -9,19 +10,5 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
 
-  postgres:
-    image: postgres:16-alpine
-    container_name: germanlawrag-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: germanlawrag
-      POSTGRES_PASSWORD: germanlawrag
-      POSTGRES_DB: germanlawrag
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
 volumes:
   qdrant_storage:
-  postgres_data:

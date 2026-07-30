@@ -1,4 +1,7 @@
-.PHONY: install dev chunks index index-all chunking-compare queries eval test lint format up down
+# Task shortcuts — run e.g. `make index` or `make test`.
+# Each target just runs the uv/script command under it.
+# `make up`/`make down` start and stop the Docker services.
+.PHONY: install dev chunks index index-all chunking-compare queries eval test lint frontend-build verify format up down
 
 install:
 	uv sync --extra dev
@@ -30,6 +33,11 @@ test:
 lint:
 	uv run ruff check .
 	uv run mypy
+
+frontend-build:
+	npm --prefix frontend run build
+
+verify: test lint frontend-build
 
 format:
 	uv run ruff format .

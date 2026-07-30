@@ -41,7 +41,15 @@ class IndexStats:
     collection_ready: bool
 
 
+# The orchestrator for search. One instance owns the chunk store,
+# the BM25 index, the Qdrant client, the embedding model, and the
+# reranker, and exposes them all through a single retrieve()
+# call. The rest of the app never touches those parts directly.
 class RetrievalService:
+    # Build-time wiring. The store + BM25 index are built right away
+    # (fast, in memory). The embedding and reranker models are created
+    # here but only load their weights on first use, so constructing
+    # the service stays cheap (good for tests and /health).
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
         self._candidate_pool = settings.retrieval_candidate_pool
@@ -58,6 +66,8 @@ class RetrievalService:
             device=settings.embedding_device,
         )
 
+    # Lightweight index report for the /index/stats route: local chunk count
+    # plus Qdrant's point count (0 when the collection doesn't exist yet).
     def stats(self) -> IndexStats:
         ready = self._dense.collection_exists()
         return IndexStats(
@@ -68,6 +78,12 @@ class RetrievalService:
             collection_ready=ready,
         )
 
+    # The one public search method. Receives the user query plus options and returns
+    # a ranked list of ScoredChunk (each = chunk + score + which stage ranked it).
+    # Pipeline: choose the stage (dense / bm25 / hybrid) -> pull exact section+law
+    # matches to the front -> optionally rerank a deeper pool -> trim to top_k.
+    # `fetch_n` is wider than top_k only when reranking, so the cross-encoder has
+    # spare candidates to re-sort; otherwise we fetch exactly what we return.
     def retrieve(
         self,
         query: str,
@@ -103,12 +119,15 @@ class RetrievalService:
 
     # -- individual retrieval stages ------------------------------------------
 
+    # Dense stage — embed the query into a vector and ask Qdrant for nearest chunks.
     def _dense_search(
         self, query: str, fetch_n: int, law_code: str | None
     ) -> list[tuple[str, float]]:
         vector = self._embedder.encode_query(query)
         return self._dense.search(vector, top_k=fetch_n, law_code=law_code)
 
+    # Lexical stage — exact-term matching. BM25 can't filter by law_code inside its
+    # index, so when a law_code is given we over-fetch and filter the hits by hand.
     def _bm25_search(
         self, query: str, fetch_n: int, law_code: str | None
     ) -> list[tuple[str, float]]:
@@ -123,6 +142,9 @@ class RetrievalService:
         ]
         return filtered[:fetch_n]
 
+    # Hybrid stage — run dense + BM25 at full pool depth, then merge
+    # their rank positions with RRF (rrf.py). Combining ranks instead
+    # of raw scores lets two very different score scales blend fairly.
     def _hybrid_search(
         self, query: str, fetch_n: int, law_code: str | None
     ) -> list[tuple[str, float]]:
@@ -136,6 +158,8 @@ class RetrievalService:
         ]
         return fuse_retrieval_results(dense_ids, bm25_ids, limit=fetch_n)
 
+    # Re-score the candidate pool with the cross-encoder, which reads each (query,
+    # chunk) pair together for a sharper relevance score, then keep top_k.
     def _apply_rerank(
         self, query: str, ranked: list[tuple[str, float]], top_k: int
     ) -> list[tuple[str, float]]:
@@ -146,6 +170,8 @@ class RetrievalService:
         ]
         return self._reranker.rerank(query, candidates, top_k=top_k)
 
+    # Hydrate bare (chunk_id, score) pairs back into full ScoredChunk objects
+    # via the store; any id not found in the store is silently dropped.
     def _to_scored_chunks(self, ranked: list[tuple[str, float]], method: str) -> list[ScoredChunk]:
         scored: list[ScoredChunk] = []
         for chunk_id, score in ranked:
@@ -154,6 +180,12 @@ class RetrievalService:
                 scored.append(ScoredChunk(chunk=chunk, score=score, method=method))
         return scored
 
+    # Precision booster for queries that name a specific section + law,
+    # e.g. "§ 433 BGB". When the query mentions BOTH a legal unit (a §/Art
+    # number) and a known law code, every chunk matching both exactly is
+    # forced to the very top (score 1.0), ahead of the statistical ranking
+    # — so the exact article is never buried by fuzzy matches. If there's
+    # no such match, the original ranking is returned untouched.
     def _prepend_exact_reference_matches(
         self,
         query: str,
@@ -182,6 +214,9 @@ class RetrievalService:
         return exact + remainder
 
 
+# Process-wide factory. @lru_cache means the heavy
+# RetrievalService is built once and reused for every request; the
+# docstring explains why failures are deliberately not cached.
 @lru_cache
 def get_retrieval_service() -> RetrievalService:
     """Process-wide singleton. Built on first request, not at import time, so the
@@ -190,6 +225,10 @@ def get_retrieval_service() -> RetrievalService:
     return RetrievalService(get_settings())
 
 
+# Small text helpers shared by retrieve() and the booster above:
+# - _query_law_codes: codes (BGB, GG, ...) named as whole words in the query.
+# - _query_legal_units: section markers (§ 433, Art 5, ...) present in the query.
+# - _normalize_legal_unit: canonicalize a marker so "§ 433" and "§433" match.
 def _query_law_codes(query: str, law_codes: list[str]) -> set[str]:
     query_folded = query.casefold()
     known_codes = {code.casefold() for code in law_codes if code}

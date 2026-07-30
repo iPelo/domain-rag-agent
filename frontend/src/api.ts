@@ -2,6 +2,9 @@
 // All requests go through the `/api` prefix, which Vite proxies to the backend
 // in development (see vite.config.ts).
 
+// This is the ONLY file that talks to the backend. Components call these typed
+// functions and never touch fetch() directly, so all HTTP details live in one
+// place. The interfaces below mirror the Pydantic models in backend/app/schemas.py.
 const API_BASE = import.meta.env.VITE_API_BASE ?? "/api";
 
 export const RETRIEVAL_MODES = ["hybrid", "bm25", "dense"] as const;
@@ -68,6 +71,8 @@ export interface SearchParams {
   lawCode?: string;
 }
 
+// Custom error that remembers the HTTP status, so App.tsx can show tailored hints
+// (e.g. 503 = index not built / model not configured) instead of a generic message.
 /** Error carrying the HTTP status so the UI can react to 503/502 specifically. */
 export class ApiError extends Error {
   status: number;
@@ -97,6 +102,10 @@ function formatDetail(detail: unknown): string | null {
   return null;
 }
 
+// The shared fetch wrapper every call below uses. It does three
+// jobs: prefix the path with /api, parse the JSON body, and on a
+// non-2xx response throw an ApiError carrying the server's detail
+// message. A network failure becomes ApiError(..., status 0).
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
@@ -139,6 +148,8 @@ export function getIndexStats(): Promise<IndexStats> {
   return request<IndexStats>("/index/stats");
 }
 
+// GET /retrieve — options go in the query string.
+// Mirrors the /retrieve route in main.py.
 export function retrieve(params: SearchParams): Promise<RetrieveResponse> {
   const query = new URLSearchParams({
     q: params.query,
@@ -152,6 +163,8 @@ export function retrieve(params: SearchParams): Promise<RetrieveResponse> {
   return request<RetrieveResponse>(`/retrieve?${query.toString()}`);
 }
 
+// POST /answer — options go in a JSON body (lawCode
+// becomes null when blank), matching AnswerRequest.
 export function answer(params: SearchParams): Promise<AnswerResponse> {
   return request<AnswerResponse>("/answer", {
     method: "POST",

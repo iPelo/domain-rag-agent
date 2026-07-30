@@ -6,6 +6,11 @@ from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+# Central configuration. Every field below can be overridden by an environment
+# variable of the SAME NAME (uppercased) or a line in the .env file —
+# pydantic-settings reads them automatically, so there are no scattered os.getenv
+# calls in the code. The value written here is just the default used when that env
+# var is absent.
 class Settings(BaseSettings):
     app_env: str = "local"
     domain_name: str = "GermanLawRAG"
@@ -41,17 +46,14 @@ class Settings(BaseSettings):
     model_max_tokens: int = 800
     model_timeout_seconds: float = 60.0
 
-    langfuse_host: str = "http://localhost:3000"
-    langfuse_public_key: str | None = None
-    langfuse_secret_key: str | None = None
-
+    # Treats an empty env var (e.g. `MODEL_API_KEY=`) as "not
+    # set" (None) rather than "". Without this, a blank line in
+    # .env would look like a real—but empty—value downstream.
     @field_validator(
         "embedding_device",
         "model_name",
         "model_base_url",
         "model_api_key",
-        "langfuse_public_key",
-        "langfuse_secret_key",
         mode="before",
     )
     @classmethod
@@ -60,6 +62,8 @@ class Settings(BaseSettings):
             return None
         return value
 
+    # Tells pydantic where to read values: the .env file (UTF-8). `extra="ignore"`
+    # means unknown keys in .env are skipped instead of raising an error.
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -67,6 +71,9 @@ class Settings(BaseSettings):
     )
 
 
+# Returns one shared, cached Settings instance. @lru_cache
+# means .env is read once and every caller (routes, scripts)
+# gets the same object. FastAPI injects this via Depends.
 @lru_cache
 def get_settings() -> Settings:
     return Settings()

@@ -1,3 +1,5 @@
+# Retrieval-quality metrics used by the eval harness (scripts/run_eval.py).
+# precision_at_k = of the top-k results, what fraction are in the expected set.
 def precision_at_k(retrieved_ids: list[str], expected_ids: set[str], *, k: int) -> float:
     if k <= 0:
         raise ValueError("k must be positive")
@@ -9,6 +11,9 @@ def precision_at_k(retrieved_ids: list[str], expected_ids: set[str], *, k: int) 
     return hits / k
 
 
+# MRR = 1/rank of the FIRST correct hit (1.0 if the top
+# result is right, 0.5 if second...), so it rewards putting a
+# relevant chunk as high as possible. 0 if none are relevant.
 def mean_reciprocal_rank(retrieved_ids: list[str], expected_ids: set[str]) -> float:
     if not expected_ids:
         return 0.0

@@ -15,6 +15,9 @@ from collections.abc import Sequence
 from typing import Any
 
 
+# Wraps the sentence-transformers embedding model so the
+# rest of the app never imports that library directly.
+# Turns text into vectors for dense (meaning-based) search.
 class EmbeddingModel:
     def __init__(
         self,
@@ -32,6 +35,8 @@ class EmbeddingModel:
     def model_name(self) -> str:
         return self._model_name
 
+    # Lazy loader: the heavy weights load on first real use, not at import/startup,
+    # which keeps tests and /health fast. self._model stays None until then.
     def _ensure_model(self) -> Any:
         if self._model is None:
             from sentence_transformers import SentenceTransformer
@@ -48,6 +53,9 @@ class EmbeddingModel:
             getter = model.get_sentence_embedding_dimension
         return int(getter())
 
+    # Embed many passages at once. normalize_embeddings=True
+    # makes every vector unit length, so a dot-product search in
+    # Qdrant equals cosine similarity. Returns plain float lists.
     def encode(
         self,
         texts: Sequence[str],
@@ -67,6 +75,8 @@ class EmbeddingModel:
         )
         return [[float(value) for value in row] for row in vectors]
 
+    # Embed a single query (just encode() of a
+    # one-item batch, returning its one vector).
     def encode_query(self, query: str) -> list[float]:
         """Embed a single query string."""
         return self.encode([query])[0]

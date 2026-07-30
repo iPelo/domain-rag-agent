@@ -3,6 +3,10 @@ from app.ingestion.loaders import load_local_documents
 from app.ingestion.models import RawDocument
 
 
+# End-to-end ingestion test on a tiny in-memory law file (written to
+# tmp_path): it must be loaded with the right metadata (law_code,
+# source_url) and chunked by legal heading, with Art 5 carrying its
+# citation + parent hierarchy. Covers loaders + chunking together.
 def test_loads_german_law_markdown_and_chunks_by_legal_heading(tmp_path) -> None:
     law_path = tmp_path / "german-laws" / "g" / "gg" / "index.md"
     law_path.parent.mkdir(parents=True)
@@ -48,6 +52,8 @@ Ausfertigungsdatum
     assert art_5.text.startswith("I. - Die Grundrechte > Art 5")
 
 
+# Checks the recursive strategy never exceeds
+# chunk_size and produces no duplicate chunks.
 def test_recursive_chunking_keeps_chunks_bounded() -> None:
     document = RawDocument(
         source_id="test",

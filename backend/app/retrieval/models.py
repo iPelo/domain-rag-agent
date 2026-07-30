@@ -11,6 +11,10 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
+# The runtime form of a chunk — what the search side works with. Built from one
+# jsonl line via from_jsonl_record(), which lifts
+# citation/law_code/source_url/hierarchy out of the nested metadata into top-level
+# fields for easy access.
 @dataclass(frozen=True)
 class IndexedChunk:
     """A processed corpus chunk as loaded by the retrieval service."""
@@ -41,6 +45,9 @@ class IndexedChunk:
         )
 
 
+# An IndexedChunk plus its retrieval score and `method` (which
+# stage produced it, e.g. "hybrid" or "hybrid+rerank"). This
+# is what retrieve() hands back up to the API layer.
 @dataclass(frozen=True)
 class ScoredChunk:
     """A chunk paired with its retrieval score and the stage that produced it."""

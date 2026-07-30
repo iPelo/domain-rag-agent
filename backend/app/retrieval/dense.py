@@ -19,11 +19,18 @@ from typing import Any
 _CHUNK_ID_NAMESPACE = uuid.UUID("6f9619ff-8b86-d011-b42d-00cf4fc964ff")
 
 
+# Qdrant point ids must be ints or UUIDs, but our chunk_ids
+# are strings. This maps each string id to a DETERMINISTIC
+# UUIDv5, so re-indexing overwrites the same point (no dupes).
 def point_id_for(chunk_id: str) -> str:
     """Stable Qdrant point id for a chunk id."""
     return str(uuid.uuid5(_CHUNK_ID_NAMESPACE, chunk_id))
 
 
+# Thin client around Qdrant for vector storage + nearest-neighbor search. Stores
+# one point per chunk: the vector + a tiny payload (chunk_id, law_code) used for
+# hydration and metadata filtering. The qdrant_client import is local to each
+# method, so importing this module costs nothing until Qdrant is actually used.
 class DenseRetriever:
     def __init__(self, qdrant_url: str, collection_name: str) -> None:
         self._qdrant_url = qdrant_url
@@ -49,6 +56,9 @@ class DenseRetriever:
     def count(self) -> int:
         return int(self._client.count(self._collection_name).count)
 
+    # Drop + recreate the collection for a clean rebuild.
+    # COSINE distance pairs with the normalized vectors from
+    # embeddings.py (cosine == dot product for unit vectors).
     def recreate_collection(self, *, dim: int) -> None:
         """Drop and recreate the collection — used by the indexer for a clean build."""
         from qdrant_client.models import Distance, VectorParams
@@ -60,6 +70,9 @@ class DenseRetriever:
             vectors_config=VectorParams(size=dim, distance=Distance.COSINE),
         )
 
+    # Insert/replace a batch of points. Each chunk_id becomes a
+    # stable UUID point id, and the chunk_id is also kept inside
+    # the payload so searches can map results back to chunks.
     def upsert(
         self,
         chunk_ids: Sequence[str],
@@ -78,6 +91,9 @@ class DenseRetriever:
         ]
         self._client.upsert(collection_name=self._collection_name, points=points)
 
+    # Nearest-neighbor search for a query vector. An optional
+    # law_code adds a payload filter so Qdrant only considers
+    # that law. Returns (chunk_id, cosine_score) pairs.
     def search(
         self,
         query_vector: Sequence[float],
@@ -111,6 +127,8 @@ def _law_code_filter(law_code: str | None) -> Any:
     return Filter(must=[FieldCondition(key="law_code", match=MatchValue(value=law_code))])
 
 
+# Yield fixed-size slices of a sequence —
+# used to embed/upsert the corpus in batches.
 def iter_batches(items: Sequence[Any], batch_size: int) -> Iterable[list[Any]]:
     for start in range(0, len(items), batch_size):
         yield list(items[start : start + batch_size])

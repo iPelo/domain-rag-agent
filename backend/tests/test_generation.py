@@ -6,6 +6,9 @@ from app.retrieval.models import IndexedChunk, ScoredChunk
 from app.retrieval.service import RetrievalService
 
 
+# Tests for GenerationService using two fakes: FakeChatClient
+# returns a fixed answer (and counts calls), FakeRetrievalService
+# returns fixed sources. No network, no model, no Qdrant.
 class FakeChatClient:
     def __init__(self, answer: str) -> None:
         self.answer = answer
@@ -58,6 +61,8 @@ def test_generation_builds_grounded_answer_with_citations() -> None:
     assert result.sources == [source]
 
 
+# The short-circuit case: with no sources it must answer "not enough
+# information" and NOT call the chat model at all (asserts chat.calls == 0).
 def test_generation_without_sources_returns_unsupported_answer_without_model_call() -> None:
     chat = FakeChatClient("should not be used")
     retrieval = FakeRetrievalService([])
@@ -80,6 +85,8 @@ def test_generation_rejects_answers_without_citations() -> None:
         service.answer("Welche Pflichten hat der Verkäufer?")
 
 
+# The guardrail in action: an answer citing a chunk id that wasn't retrieved must
+# raise CitationValidationError, so invented citations can never reach the user.
 def test_generation_rejects_unknown_chunk_citations() -> None:
     source = _scored_chunk("german-laws::bgb::sec-433", "Der Verkäufer muss liefern.")
     chat = FakeChatClient("Der Verkäufer muss liefern. [german-laws::bgb::sec-999]")
