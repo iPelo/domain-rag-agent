@@ -27,6 +27,3 @@ Please describe:
 - why the change is useful;
 - how it was tested;
 - any limitations or follow-up work.
-
-AI-assisted contributions are welcome. Review generated code, disclose material
-AI assistance, and make sure you can explain the submitted change.

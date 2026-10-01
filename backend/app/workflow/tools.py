@@ -4,8 +4,6 @@ from app.retrieval.models import ScoredChunk
 from app.retrieval.service import RetrievalMode, RetrievalService
 
 
-# A retrieval result packaged as a tool output. Note: this is the workflow's OWN
-# RetrievedChunk, separate from the API model with the same name in schemas.py.
 @dataclass(frozen=True)
 class RetrievedChunk:
     chunk_id: str
@@ -32,9 +30,6 @@ class RetrievedChunk:
         )
 
 
-# Wraps the RetrievalService as a callable "tool" with a name
-# + description — the shape a tool-calling workflow expects.
-# Stores default options so callers can just pass a query.
 class RetrievalTool:
     name = "retrieve"
     description = "Search the German law corpus for source passages."
@@ -52,9 +47,6 @@ class RetrievalTool:
         self._default_top_k = default_top_k
         self._default_rerank = default_rerank
 
-    # Makes the instance callable like a function: tool("some
-    # query"). Per-call arguments override the stored defaults (None
-    # means "use the default"), then it delegates to retrieve().
     def __call__(
         self,
         query: str,

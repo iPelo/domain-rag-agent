@@ -11,10 +11,6 @@ from app.retrieval.rrf import reciprocal_rank_fusion
 from app.retrieval.store import ChunkStore
 
 
-# Unit tests for the retrieval building blocks (tokenizer, BM25,
-# RRF, ChunkStore, ids). They avoid Qdrant and the ML models
-# entirely, so they're fast and deterministic. _chunk() is a tiny
-# factory that builds a throwaway IndexedChunk for the tests below.
 def _chunk(chunk_id: str, text: str, law: str = "GG") -> IndexedChunk:
     return IndexedChunk(
         chunk_id=chunk_id,
@@ -25,9 +21,6 @@ def _chunk(chunk_id: str, text: str, law: str = "GG") -> IndexedChunk:
         law_code=law,
         source_url="https://example.test/",
     )
-
-
-# -- tokenization & BM25 ------------------------------------------------------
 
 
 def test_tokenize_keeps_section_symbol_and_lowercases() -> None:
@@ -76,9 +69,6 @@ def test_bm25_requires_a_non_empty_corpus() -> None:
         BM25Retriever([])
 
 
-# -- reciprocal rank fusion ---------------------------------------------------
-
-
 def test_rrf_rewards_results_both_retrievers_agree_on() -> None:
     fused = reciprocal_rank_fusion([["x", "y", "z"], ["x", "z", "y"]], limit=3)
     assert fused[0][0] == "x"
@@ -92,10 +82,7 @@ def test_rrf_unions_disjoint_lists() -> None:
 def test_fuse_retrieval_results_merges_dense_and_bm25() -> None:
     fused = fuse_retrieval_results(["a", "b", "c"], ["a", "c", "b"], limit=3)
     assert {item_id for item_id, _ in fused} == {"a", "b", "c"}
-    assert fused[0][0] == "a"  # top of both lists -> top after fusion
-
-
-# -- chunk store --------------------------------------------------------------
+    assert fused[0][0] == "a"
 
 
 def test_chunk_store_loads_and_hydrates(tmp_path) -> None:
@@ -129,27 +116,15 @@ def test_chunk_store_missing_file_raises(tmp_path) -> None:
         ChunkStore.from_jsonl(tmp_path / "does-not-exist.jsonl")
 
 
-# -- dense point ids ----------------------------------------------------------
-
-
-# Confirms the chunk_id -> UUID mapping is stable (same id -> same point, so
-# re-indexing overwrites instead of duplicating) and collision-free across different
-# ids.
 def test_point_id_is_deterministic_and_unique() -> None:
     assert point_id_for("german-laws::gg::art-5") == point_id_for("german-laws::gg::art-5")
     assert point_id_for("german-laws::gg::art-5") != point_id_for("german-laws::gg::art-6")
 
 
-# -- model wrappers are lazy --------------------------------------------------
-
-
-# Guards the lazy-loading promise: encoding empty input must
-# NOT pull in the heavy weights. It checks the private _model
-# is still None — a deliberate peek to assert nothing loaded.
 def test_embedding_model_does_not_load_for_empty_input() -> None:
     model = EmbeddingModel("BAAI/bge-m3")
     assert model.encode([]) == []
-    assert model._model is None  # never loaded the ~2GB weights
+    assert model._model is None
 
 
 def test_reranker_does_not_load_for_empty_candidates() -> None:

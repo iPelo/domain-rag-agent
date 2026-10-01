@@ -6,11 +6,6 @@ from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-# Central configuration. Every field below can be overridden by an environment
-# variable of the SAME NAME (uppercased) or a line in the .env file —
-# pydantic-settings reads them automatically, so there are no scattered os.getenv
-# calls in the code. The value written here is just the default used when that env
-# var is absent.
 class Settings(BaseSettings):
     app_env: str = "local"
     domain_name: str = "GermanLawRAG"
@@ -24,14 +19,12 @@ class Settings(BaseSettings):
     data_raw_dir: Path = Path("data/raw/german-laws")
     data_processed_dir: Path = Path("data/processed")
 
-    # Chunks the retrieval service loads at runtime (BM25 index + payload hydration).
-    # build_index.py writes this file; defaults to the curated subset.
     index_chunks_path: Path = Path("data/processed/chunks.curated.jsonl")
 
     embedding_model: str = "BAAI/bge-m3"
     embedding_dim: int = 1024
     embedding_batch_size: int = 32
-    # None lets sentence-transformers pick (MPS on Apple Silicon, else CPU).
+
     embedding_device: str | None = None
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
 
@@ -46,9 +39,6 @@ class Settings(BaseSettings):
     model_max_tokens: int = 800
     model_timeout_seconds: float = 60.0
 
-    # Treats an empty env var (e.g. `MODEL_API_KEY=`) as "not
-    # set" (None) rather than "". Without this, a blank line in
-    # .env would look like a real—but empty—value downstream.
     @field_validator(
         "embedding_device",
         "model_name",
@@ -62,8 +52,6 @@ class Settings(BaseSettings):
             return None
         return value
 
-    # Tells pydantic where to read values: the .env file (UTF-8). `extra="ignore"`
-    # means unknown keys in .env are skipped instead of raising an error.
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -71,9 +59,6 @@ class Settings(BaseSettings):
     )
 
 
-# Returns one shared, cached Settings instance. @lru_cache
-# means .env is read once and every caller (routes, scripts)
-# gets the same object. FastAPI injects this via Depends.
 @lru_cache
 def get_settings() -> Settings:
     return Settings()

@@ -1,9 +1,4 @@
-"""Run the golden retrieval set and write a compact report.
-
-The runner scores each retrieval configuration against `eval/golden_set.jsonl`
-using exact chunk-id matches. BM25 can run from the local chunk file alone.
-Dense and hybrid runs require Qdrant to be running and indexed.
-"""
+"""Evaluate retrieval modes against the golden question set."""
 
 from __future__ import annotations
 
@@ -23,8 +18,6 @@ DEFAULT_GOLDEN_SET = ROOT_DIR / "eval" / "golden_set.jsonl"
 DEFAULT_OUT_DIR = ROOT_DIR / "eval" / "results"
 
 
-# One retrieval setup to score (a name + mode + whether to rerank). DEFAULT_CONFIGS
-# runs bm25, dense, and hybrid so their numbers can be compared side by side.
 @dataclass(frozen=True)
 class RetrievalConfig:
     name: str
@@ -39,10 +32,6 @@ DEFAULT_CONFIGS: tuple[RetrievalConfig, ...] = (
 )
 
 
-# The evaluation harness. For each config it runs every golden-set query,
-# compares the retrieved chunk_ids against the expected ones, and writes
-# a timestamped JSON + Markdown report (plus latest.json/latest.md). BM25
-# works offline; dense/hybrid need Qdrant ready.
 def main() -> None:
     from app.config import get_settings
     from app.eval.metrics import mean_reciprocal_rank, precision_at_k
@@ -145,8 +134,6 @@ def main() -> None:
     print(f"Wrote {md_path}")
 
 
-# Probe Qdrant once up front so dense/hybrid configs can be cleanly skipped
-# (with a reason) instead of erroring on every query when the index isn't built.
 def _qdrant_ready(service: Any) -> tuple[bool, str | None]:
     try:
         stats = service.stats()
@@ -182,8 +169,6 @@ def _load_cases(path: Path) -> list[dict[str, Any]]:
     return cases
 
 
-# Fail fast on a malformed golden-set line (missing fields) with the
-# exact line number, so a typo in the eval data is easy to find.
 def _validate_case(case: dict[str, Any], line_number: int) -> None:
     required = {"id", "query", "expected_answer", "expected_source_chunks"}
     missing = sorted(required - set(case))
@@ -193,8 +178,6 @@ def _validate_case(case: dict[str, Any], line_number: int) -> None:
         raise SystemExit(f"golden set line {line_number} needs expected_source_chunks.")
 
 
-# Roll the per-query rows up into headline
-# numbers: hit rate, mean precision@k, mean MRR.
 def _summarize(rows: list[dict[str, Any]], *, total_cases: int) -> dict[str, float | int]:
     completed = len(rows)
     if not rows:
@@ -214,8 +197,6 @@ def _summarize(rows: list[dict[str, Any]], *, total_cases: int) -> dict[str, flo
     }
 
 
-# Render the report dict as a human-readable
-# Markdown table (the file you actually read).
 def _markdown_report(report: dict[str, Any]) -> str:
     lines = [
         "# Retrieval Evaluation",
@@ -233,8 +214,7 @@ def _markdown_report(report: dict[str, Any]) -> str:
     for name, result in report["results"].items():
         summary = result["summary"]
         row_format = (
-            "| {name} | {completed}/{total} | {hit:.3f} | "
-            "{precision:.3f} | {mrr:.3f} | {errors} |"
+            "| {name} | {completed}/{total} | {hit:.3f} | {precision:.3f} | {mrr:.3f} | {errors} |"
         )
         lines.append(
             row_format.format(

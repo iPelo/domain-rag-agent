@@ -1,17 +1,4 @@
-"""Build the dense vector index in Qdrant.
-
-Reads the processed chunk corpus, optionally narrows it to the curated subset of
-major federal codes, embeds every chunk with the configured model, and upserts
-the vectors into the Qdrant collection.
-
-    uv run python scripts/build_index.py                 # curated subset (~15k chunks)
-    uv run python scripts/build_index.py --all           # full corpus (~178k chunks)
-    uv run python scripts/build_index.py --limit 200     # quick smoke test
-
-The curated chunk file it writes (`--out`) is what the API loads at runtime for
-the BM25 index and payload hydration, so this script is the single entry point
-for refreshing the index.
-"""
+"""Build the Qdrant vector index from processed chunks."""
 
 from __future__ import annotations
 
@@ -25,11 +12,6 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR / "backend"))
 
 
-# The indexer. Selects chunks (curated subset by default, or --all),
-# writes the runtime chunk file the API loads, then embeds every chunk
-# and upserts the vectors into Qdrant in batches. At the end it checks
-# Qdrant's point count matches what was selected. Imports live inside
-# main() so `--help` is instant and doesn't load heavy ML libraries.
 def main() -> None:
     from app.config import get_settings
     from app.ingestion.curated import CURATED_LAW_SLUGS
@@ -118,8 +100,6 @@ def main() -> None:
     print(f"Done in {elapsed:.0f}s. Qdrant points: {point_count:,}")
 
 
-# Embedding is the expensive step, so a brief Qdrant hiccup shouldn't waste a batch.
-# This retries the upsert with exponential backoff, reconnecting between attempts.
 def _upsert_with_retry(
     retriever,
     *,
@@ -147,8 +127,6 @@ def _upsert_with_retry(
             retriever.reconnect()
 
 
-# Stream the chunk jsonl and keep only what we want to index: the curated codes
-# (unless --all) and at most --limit records. Returns the selected raw chunk dicts.
 def _load_chunks(path: Path, *, curated_only: bool, limit: int | None) -> list[dict]:
     from app.ingestion.curated import is_curated_slug
 
@@ -168,8 +146,6 @@ def _load_chunks(path: Path, *, curated_only: bool, limit: int | None) -> list[d
     return records
 
 
-# The tiny per-vector payload stored in Qdrant (law_code + slug) — just enough to
-# filter and identify; the full chunk text stays in the chunk file, not in Qdrant.
 def _payload(record: dict) -> dict:
     metadata = record.get("metadata", {})
     return {

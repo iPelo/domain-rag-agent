@@ -1,12 +1,4 @@
-"""Lexical retrieval with BM25.
-
-Dense embeddings miss exact legal anchors — section numbers, abbreviations like
-"BGB" or "StPO", the "§" symbol. BM25 is the complement: it ranks by exact term
-overlap. The two are fused later via RRF.
-
-The index is built in memory from the curated chunk file at API startup
-(~15k chunks, well under a second).
-"""
+"""BM25 retrieval for exact terms and legal references."""
 
 from __future__ import annotations
 
@@ -17,8 +9,6 @@ from rank_bm25 import BM25Okapi
 
 from app.retrieval.models import IndexedChunk
 
-# Keep "§" as its own token (queries like "§ 433 BGB" depend on it) and split
-# everything else on Unicode word boundaries so umlauts survive.
 _TOKEN_RE = re.compile(r"§+|\w+", re.UNICODE)
 _LEGAL_UNIT_RE = re.compile(r"(§+\s*\d+[a-zA-Z]*|art\.?\s*\d+[a-zA-Z]*)", re.IGNORECASE)
 _GERMAN_REPLACEMENTS = str.maketrans(
@@ -31,10 +21,6 @@ _GERMAN_REPLACEMENTS = str.maketrans(
 )
 
 
-# Turn text into BM25 tokens. Lowercases, keeps "§" as its own token
-# (queries like "§ 433 BGB" depend on it), and via _token_forms also
-# adds umlaut-folded + prefix variants so e.g. "Kündigung" still
-# matches "kuendigung" and partial German compound words.
 def tokenize(text: str) -> list[str]:
     tokens: list[str] = []
     for raw_token in _TOKEN_RE.findall(text.casefold()):
@@ -42,9 +28,6 @@ def tokenize(text: str) -> list[str]:
     return tokens
 
 
-# Lexical (keyword) retriever. Builds an in-memory BM25 index over the chunk
-# texts at startup. It complements dense search by nailing EXACT terms — section
-# numbers, "§", abbreviations like "BGB" — that meaning-based vectors often miss.
 class BM25Retriever:
     def __init__(self, chunks: list[IndexedChunk]) -> None:
         if not chunks:
@@ -53,9 +36,6 @@ class BM25Retriever:
         self._chunk_ids = [chunk.chunk_id for chunk in chunks]
         self._index = BM25Okapi([tokenize(_searchable_text(chunk)) for chunk in chunks])
 
-    # Score every chunk against the query tokens, then boost
-    # chunks whose law_code or section number the query explicitly
-    # names, so exact-reference queries rank correctly.
     def search(self, query: str, *, top_k: int = 10) -> list[tuple[str, float]]:
         """Return `(chunk_id, bm25_score)` for the best-matching chunks."""
         query_tokens = tokenize(query)
@@ -75,9 +55,6 @@ class BM25Retriever:
         return [(chunk_id, float(score)) for chunk_id, score in ranked[:top_k]]
 
 
-# Expand one token into the forms we also want to match on: the
-# original, an ASCII-folded version (ä->ae ...), and for long
-# German words a few prefixes (cheap stemming for compounds).
 def _token_forms(token: str) -> list[str]:
     if token == "§":
         return [token]
@@ -99,10 +76,8 @@ def _fold_german(value: str) -> str:
     return "".join(char for char in normalized if not unicodedata.combining(char))
 
 
-# The text BM25 actually indexes per chunk. law_code and
-# citation are repeated twice on purpose — a crude weighting
-# so those high-signal fields count more than the body text.
 def _searchable_text(chunk: IndexedChunk) -> str:
+    # Repeating citation fields gives them more weight than body text.
     return "\n".join(
         [
             chunk.law_code,
@@ -126,9 +101,6 @@ def _query_legal_units(query: str) -> set[str]:
     return {_normalize_legal_unit(match.group(1)) for match in _LEGAL_UNIT_RE.finditer(query)}
 
 
-# Add a flat bonus when the chunk's law_code / section
-# number matches one named in the query. This pushes an
-# exact "§ 242 StGB"-style hit above merely topical matches.
 def _boosted_score(
     chunk: IndexedChunk,
     score: float,

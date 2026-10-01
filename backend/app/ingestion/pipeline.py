@@ -6,11 +6,6 @@ from app.ingestion.loaders import load_local_documents
 from app.ingestion.models import DocumentChunk, RawDocument
 
 
-# The ingestion entry point that ties Stage 1 (load) and Stage 2 (chunk) together.
-# Reads every raw document, chunks each one, and streams the results to two .jsonl
-# files (one line per document, one line per chunk). Returns (document_count,
-# chunk_count). Writing line-by-line keeps memory flat even on the full ~178k-chunk
-# corpus.
 def build_processed_corpus(
     raw_dir: Path,
     *,
@@ -41,8 +36,6 @@ def build_processed_corpus(
     return len(documents), chunk_count
 
 
-# Thin convenience wrapper — chunks only, writing
-# documents.jsonl beside the output automatically.
 def build_processed_chunks(raw_dir: Path, output_path: Path) -> int:
     _, chunk_count = build_processed_corpus(
         raw_dir,
@@ -52,8 +45,6 @@ def build_processed_chunks(raw_dir: Path, output_path: Path) -> int:
     return chunk_count
 
 
-# Plain dict serializers so each dataclass becomes
-# one JSON line (jsonl = one record per line).
 def _document_to_json(document: RawDocument) -> dict[str, object]:
     return {
         "source_id": document.source_id,

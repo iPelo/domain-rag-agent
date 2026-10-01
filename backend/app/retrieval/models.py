@@ -1,9 +1,4 @@
-"""Shared retrieval data structures.
-
-Everything downstream of ingestion is keyed on `chunk_id`. The retrievers
-(dense, BM25) return `(chunk_id, score)` pairs; the `ChunkStore` hydrates those
-ids into `IndexedChunk`s for API responses and reranking.
-"""
+"""Shared retrieval data structures."""
 
 from __future__ import annotations
 
@@ -11,10 +6,6 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
-# The runtime form of a chunk — what the search side works with. Built from one
-# jsonl line via from_jsonl_record(), which lifts
-# citation/law_code/source_url/hierarchy out of the nested metadata into top-level
-# fields for easy access.
 @dataclass(frozen=True)
 class IndexedChunk:
     """A processed corpus chunk as loaded by the retrieval service."""
@@ -45,9 +36,6 @@ class IndexedChunk:
         )
 
 
-# An IndexedChunk plus its retrieval score and `method` (which
-# stage produced it, e.g. "hybrid" or "hybrid+rerank"). This
-# is what retrieve() hands back up to the API layer.
 @dataclass(frozen=True)
 class ScoredChunk:
     """A chunk paired with its retrieval score and the stage that produced it."""

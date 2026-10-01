@@ -1,13 +1,4 @@
-"""Dense embedding model wrapper.
-
-Thin layer over `sentence-transformers` so the rest of the app never imports it
-directly. The model is loaded lazily on first use — importing this module is
-cheap, which keeps FastAPI startup and the test suite fast.
-
-`bge-m3` is multilingual (German matters here) and produces 1024-d vectors. We
-L2-normalize every embedding so a dot-product search in Qdrant is exactly cosine
-similarity.
-"""
+"""Lazy sentence-transformers model wrapper."""
 
 from __future__ import annotations
 
@@ -15,9 +6,6 @@ from collections.abc import Sequence
 from typing import Any
 
 
-# Wraps the sentence-transformers embedding model so the
-# rest of the app never imports that library directly.
-# Turns text into vectors for dense (meaning-based) search.
 class EmbeddingModel:
     def __init__(
         self,
@@ -35,8 +23,6 @@ class EmbeddingModel:
     def model_name(self) -> str:
         return self._model_name
 
-    # Lazy loader: the heavy weights load on first real use, not at import/startup,
-    # which keeps tests and /health fast. self._model stays None until then.
     def _ensure_model(self) -> Any:
         if self._model is None:
             from sentence_transformers import SentenceTransformer
@@ -47,15 +33,13 @@ class EmbeddingModel:
     @property
     def dimension(self) -> int:
         model = self._ensure_model()
-        # sentence-transformers renamed this method in v5; support both.
+
+        # sentence-transformers renamed this method in version 5.
         getter = getattr(model, "get_embedding_dimension", None)
         if getter is None:
             getter = model.get_sentence_embedding_dimension
         return int(getter())
 
-    # Embed many passages at once. normalize_embeddings=True
-    # makes every vector unit length, so a dot-product search in
-    # Qdrant equals cosine similarity. Returns plain float lists.
     def encode(
         self,
         texts: Sequence[str],
@@ -75,8 +59,6 @@ class EmbeddingModel:
         )
         return [[float(value) for value in row] for row in vectors]
 
-    # Embed a single query (just encode() of a
-    # one-item batch, returning its one vector).
     def encode_query(self, query: str) -> list[float]:
         """Embed a single query string."""
         return self.encode([query])[0]

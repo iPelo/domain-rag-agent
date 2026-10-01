@@ -28,10 +28,6 @@ const INITIAL_FORM: SearchForm = {
   action: "retrieve",
 };
 
-// The root component and the only one holding state. It owns the form,
-// the current result, and the loading/error flags, and passes them
-// down to the presentational components. Data flow: Controls edits
-// `form` -> handleSubmit calls the api -> `result` re-renders below.
 export function App() {
   const [form, setForm] = useState<SearchForm>(INITIAL_FORM);
   const [result, setResult] = useState<Result | null>(null);
@@ -43,9 +39,6 @@ export function App() {
   const [stats, setStats] = useState<IndexStats | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
 
-  // On first mount, fetch /health + /index/stats for the status
-  // bar. allSettled means one failing doesn't block the other;
-  // the `active` flag avoids setting state after unmount.
   useEffect(() => {
     let active = true;
     Promise.allSettled([getHealth(), getIndexStats()]).then(([healthResult, statsResult]) => {
@@ -73,8 +66,6 @@ export function App() {
     setForm((current) => ({ ...current, ...patch }));
   };
 
-  // Runs the query. Picks /answer or /retrieve based on form.action, stores the
-  // typed result, and on an ApiError adds a friendly hint for the common 503 cases.
   const handleSubmit = async () => {
     const params = {
       query: form.query.trim(),

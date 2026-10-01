@@ -8,20 +8,13 @@ from app.ingestion.models import DocumentChunk, RawDocument
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
 LEGAL_UNIT_RE = re.compile(r"^(?P<unit>(?:§{1,2}|Art\.?|Artikel)\s+\S+)", re.IGNORECASE)
 
-# Tried in order by the recursive splitter: prefer paragraph breaks, then lines,
-# then sentences, then words, finally a hard character cut.
+
 RECURSIVE_SEPARATORS: tuple[str, ...] = ("\n\n", "\n", ". ", " ", "")
 
-# "legal-heading" is the production strategy; "fixed" and "recursive" exist for
-# the chunking comparison documented in docs/decisions.md.
+
 ChunkingStrategy = Literal["legal-heading", "fixed", "recursive"]
 
 
-# Stage 2 of ingestion: split each RawDocument into searchable DocumentChunks. This
-# dispatcher picks ONE strategy and yields chunks lazily (it's a generator).
-# "legal-heading" is the production path; "fixed"/"recursive" exist to benchmark it.
-# For the german-laws dataset it routes to the structure-aware splitter further
-# down.
 def chunk_document(
     document: RawDocument,
     *,
@@ -36,8 +29,6 @@ def chunk_document(
         yield from chunk_recursive(document, chunk_size=chunk_size, overlap=overlap)
         return
 
-    # "legal-heading": structure-aware, dataset-specific. Branch on the dataset
-    # here when adding new corpora rather than rewriting the law-specific path.
     if document.metadata.get("dataset") == "bundestag/gesetze":
         yield from chunk_german_law_markdown(document, chunk_size=chunk_size, overlap=overlap)
         return
@@ -45,10 +36,6 @@ def chunk_document(
     yield from chunk_text(document, chunk_size=chunk_size, overlap=overlap)
 
 
-# "fixed" strategy: cut the text into fixed-size windows that overlap
-# by `overlap` characters (the overlap avoids losing context at a
-# boundary). Simple, but can cut mid-word. The guard clauses reject
-# nonsensical sizes (overlap must be smaller than chunk_size).
 def chunk_text(
     document: RawDocument,
     *,
@@ -87,9 +74,6 @@ def chunk_text(
         index += 1
 
 
-# "recursive" strategy: split on a separator hierarchy (paragraph
-# -> line -> sentence -> word) so cuts fall on natural
-# boundaries. A middle-ground baseline; see the docstring below.
 def chunk_recursive(
     document: RawDocument,
     *,
@@ -136,9 +120,6 @@ def chunk_recursive(
         )
 
 
-# Recursively break text into pieces no bigger than chunk_size,
-# only descending to a finer separator when a piece is still
-# too large. Returns (segment, absolute_start) pairs.
 def _recursive_segments(
     text: str,
     *,
@@ -177,8 +158,6 @@ def _recursive_segments(
     return segments
 
 
-# Greedily glue small segments back into chunks up to chunk_size, carrying
-# a little overlap from the end of one chunk into the start of the next.
 def _pack_segments(
     segments: list[tuple[str, int]],
     *,
@@ -221,12 +200,6 @@ def _trailing_overlap(
     return carry
 
 
-# "legal-heading" strategy (production): walk the markdown headings (#, ##,
-# ### ...) and make one chunk per section, so a chunk lines up with a real
-# legal unit (e.g. "§ 433"). It tracks the heading hierarchy (parent > child)
-# and stamps each chunk with metadata used later for citations: law_code, the
-# heading, the hierarchy, and a citation string. Over-long sections are split
-# further, and chunk_ids are de-duplicated so they stay unique.
 def chunk_german_law_markdown(
     document: RawDocument,
     *,
@@ -336,9 +309,6 @@ def _citation(law_code: object, heading: str) -> str:
     return f"{prefix} {heading}".strip()
 
 
-# Make a filesystem/url-safe id fragment from a heading: map
-# §/Art to words, drop accents, lowercase, and collapse
-# everything else to hyphens. Used to build readable chunk ids.
 def _slugify(value: str) -> str:
     normalized = (
         value.replace("§§", "sections")

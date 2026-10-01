@@ -1,13 +1,4 @@
-"""Compare chunking strategies on a sample of German laws.
-
-Runs the three strategies (`legal-heading`, `fixed`, `recursive`) over the same
-laws with the same size budget, so the only variable is the boundary logic, and
-prints a Markdown stats table. The numbers feed the trade-off write-up in
-docs/decisions.md.
-
-    uv run python scripts/compare_chunking.py
-    uv run python scripts/compare_chunking.py --raw-dir data/raw/german-laws
-"""
+"""Compare chunking strategies on a sample of German laws."""
 
 from __future__ import annotations
 
@@ -19,17 +10,13 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR / "backend"))
 
-# Varied in size and structure: a short constitution, two large codes, two
-# mid-size codes.
+
 SAMPLE_SLUGS = ("gg", "bgb", "stgb", "stpo", "hgb", "urhg")
 STRATEGIES = ("legal-heading", "fixed", "recursive")
 CHUNK_SIZE = 1600
 OVERLAP = 180
 
 
-# Benchmark the three chunking strategies on the same sample
-# laws and size budget, so the only variable is the boundary
-# logic. Prints a stats table that feeds docs/decisions.md.
 def main() -> None:
     from app.ingestion.chunking import chunk_document
     from app.ingestion.loaders import load_local_documents
@@ -75,9 +62,6 @@ def main() -> None:
     _print_table(rows)
 
 
-# Heuristic quality signal: a chunk that begins lowercase was probably cut
-# mid-sentence. A lower "mid-sentence start %" means cleaner, more readable
-# boundaries.
 def _starts_mid_sentence(text: str) -> bool:
     """A chunk whose first letter is lowercase was almost certainly cut mid-sentence."""
     for char in text.lstrip():

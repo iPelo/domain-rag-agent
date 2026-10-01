@@ -9,10 +9,6 @@ import httpx
 from app.config import Settings
 
 
-# A minimal client for talking to a hosted, OpenAI-style
-# chat-completions endpoint. Two error types let callers tell apart
-# "you didn't configure a model" (-> 503) from "the model call failed"
-# (-> 502). Keeping this tiny means the model provider is swappable.
 class ModelConfigurationError(RuntimeError):
     """Raised when generation is requested without usable model configuration."""
 
@@ -21,18 +17,11 @@ class ModelRequestError(RuntimeError):
     """Raised when the configured model provider rejects or fails a request."""
 
 
-# A Protocol = a structural interface. Anything with a matching
-# complete() method counts as a ChatClient, so tests can pass a
-# fake without inheriting anything (see test_generation.py).
 class ChatClient(Protocol):
     def complete(self, *, system_prompt: str, user_prompt: str) -> str:
         """Return one answer."""
 
 
-# The real client. complete() builds the request body, POSTs it with
-# the API key, and returns the answer text. Temperature 0 by default
-# for repeatable, grounded answers. Any transport/HTTP error is
-# wrapped as ModelRequestError so callers see one error type.
 class HostedChatClient:
     def __init__(
         self,
@@ -78,9 +67,6 @@ class HostedChatClient:
         return content.strip()
 
 
-# Factory: validate the model settings from .env and build a HostedChatClient,
-# or raise ModelConfigurationError naming exactly which value is missing. Only
-# the "hosted" provider is supported today; other values are rejected early.
 def build_chat_client(settings: Settings) -> ChatClient:
     provider = settings.model_provider.casefold()
     if provider != "hosted":
@@ -102,9 +88,6 @@ def build_chat_client(settings: Settings) -> ChatClient:
     )
 
 
-# Safely dig the answer text out of the provider's JSON
-# (choices[0].message.content), returning "" if the response
-# shape is unexpected rather than throwing a KeyError.
 def _first_message_content(payload: dict[str, Any]) -> str:
     choices = payload.get("choices")
     if not isinstance(choices, list) or not choices:
