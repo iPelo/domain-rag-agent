@@ -71,6 +71,10 @@ def test_retrieve_endpoint_returns_source_metadata() -> None:
 
 
 def test_retrieve_endpoint_validates_short_queries() -> None:
-    response = TestClient(app).get("/retrieve", params={"q": "a"})
+    app.dependency_overrides[retrieval_service] = fake_retrieval_service
+    try:
+        response = TestClient(app).get("/retrieve", params={"q": "a"})
+    finally:
+        app.dependency_overrides.clear()
 
     assert response.status_code == 422
