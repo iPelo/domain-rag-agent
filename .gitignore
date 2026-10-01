@@ -43,6 +43,7 @@ README-*-rag-[Aa][Gg][Ee][Nn][Tt].md
 *Draft*.md
 *.local.md
 *.scratch.md
+docs/*Interview_Prep.docx
 
 # Local data and corpora
 data/raw/**
