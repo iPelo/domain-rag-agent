@@ -58,30 +58,43 @@ Markdown laws
 
 Requirements: Python 3.12, `uv`, Docker Compose, and Node.js 18 or newer.
 
+From the repo root:
+
 ```bash
-git clone https://github.com/iPelo/domain-rag-agent.git
-cd domain-rag-agent
 uv sync --extra dev
 npm ci --prefix frontend
 cp .env.example .env
+```
 
-git clone --depth 1 https://github.com/bundestag/gesetze.git \
-  data/raw/german-laws
-make chunks
+Then run the app in VS Code or in two terminals:
+
+```bash
+# Terminal 1
+uv run uvicorn app.main:app --reload --app-dir backend
+
+# Terminal 2
+npm run dev --prefix frontend
+```
+
+If you want the local retrieval index, start Qdrant and build it once:
+
+```bash
 make up
 make index
 ```
 
-Start the API and frontend in separate terminals:
-
-```bash
-make dev
-npm run dev --prefix frontend
-```
+Open the app here:
 
 - Frontend: `http://localhost:5173`
 - API documentation: `http://localhost:8000/docs`
 - Health check: `http://localhost:8000/health`
+
+For a simple sanity check, run:
+
+```bash
+uv run pytest -q
+npm --prefix frontend run build
+```
 
 ## Example Request
 
