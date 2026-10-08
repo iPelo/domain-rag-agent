@@ -4,11 +4,9 @@ import pytest
 from app.retrieval.bm25 import BM25Retriever, tokenize
 from app.retrieval.dense import point_id_for
 from app.retrieval.embeddings import EmbeddingModel
-from app.retrieval.hybrid import fuse_retrieval_results
-from app.retrieval.models import IndexedChunk
+from app.retrieval.models import ChunkStore, IndexedChunk
 from app.retrieval.rerank import CrossEncoderReranker
-from app.retrieval.rrf import reciprocal_rank_fusion
-from app.retrieval.store import ChunkStore
+from app.retrieval.service import reciprocal_rank_fusion
 
 
 def _chunk(chunk_id: str, text: str, law: str = "GG") -> IndexedChunk:
@@ -79,8 +77,8 @@ def test_rrf_unions_disjoint_lists() -> None:
     assert {item_id for item_id, _ in fused} == {"a", "b"}
 
 
-def test_fuse_retrieval_results_merges_dense_and_bm25() -> None:
-    fused = fuse_retrieval_results(["a", "b", "c"], ["a", "c", "b"], limit=3)
+def test_rrf_merges_dense_and_bm25_results() -> None:
+    fused = reciprocal_rank_fusion([["a", "b", "c"], ["a", "c", "b"]], limit=3)
     assert {item_id for item_id, _ in fused} == {"a", "b", "c"}
     assert fused[0][0] == "a"
 

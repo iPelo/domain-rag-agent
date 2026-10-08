@@ -10,7 +10,6 @@ from app.generation.chat_client import (
 )
 from app.generation.service import CitationValidationError, GenerationService
 from app.retrieval.service import (
-    RETRIEVAL_MODES,
     RetrievalMode,
     RetrievalService,
     get_retrieval_service,
@@ -43,26 +42,6 @@ def retrieval_service() -> RetrievalService:
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 RetrievalServiceDep = Annotated[RetrievalService, Depends(retrieval_service)]
-QueryText = Annotated[
-    str,
-    Query(min_length=2, description="Natural-language legal query."),
-]
-ModeQuery = Annotated[
-    RetrievalMode,
-    Query(description=f"Retrieval strategy: one of {', '.join(RETRIEVAL_MODES)}."),
-]
-TopKQuery = Annotated[
-    int,
-    Query(ge=1, le=50, description="Number of chunks to return."),
-]
-RerankQuery = Annotated[
-    bool,
-    Query(description="Re-score a wider candidate pool with the cross-encoder."),
-]
-LawCodeQuery = Annotated[
-    str | None,
-    Query(description="Restrict to one law, e.g. 'BGB' or 'GG' (exact match)."),
-]
 
 
 def generation_service(
@@ -107,11 +86,11 @@ def index_stats(
 @app.get("/retrieve", response_model=RetrieveResponse)
 def retrieve(
     service: RetrievalServiceDep,
-    q: QueryText,
-    mode: ModeQuery = "hybrid",
-    top_k: TopKQuery = 5,
-    rerank: RerankQuery = False,
-    law_code: LawCodeQuery = None,
+    q: Annotated[str, Query(min_length=2)],
+    mode: RetrievalMode = "hybrid",
+    top_k: Annotated[int, Query(ge=1, le=50)] = 5,
+    rerank: bool = False,
+    law_code: str | None = None,
 ) -> RetrieveResponse:
     try:
         scored = service.retrieve(q, mode=mode, top_k=top_k, rerank=rerank, law_code=law_code)

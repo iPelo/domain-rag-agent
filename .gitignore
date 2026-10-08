@@ -70,6 +70,7 @@ frontend/.env
 frontend/.env.*
 
 # Editors and OS
+.vscode/
 .DS_Store
 **/.DS_Store
 *.swp

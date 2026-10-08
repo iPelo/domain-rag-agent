@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 from typing import Any
 
 _CHUNK_ID_NAMESPACE = uuid.UUID("6f9619ff-8b86-d011-b42d-00cf4fc964ff")
@@ -99,8 +99,3 @@ def _law_code_filter(law_code: str | None) -> Any:
     from qdrant_client.models import FieldCondition, Filter, MatchValue
 
     return Filter(must=[FieldCondition(key="law_code", match=MatchValue(value=law_code))])
-
-
-def iter_batches(items: Sequence[Any], batch_size: int) -> Iterable[list[Any]]:
-    for start in range(0, len(items), batch_size):
-        yield list(items[start : start + batch_size])

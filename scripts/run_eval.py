@@ -34,7 +34,6 @@ DEFAULT_CONFIGS: tuple[RetrievalConfig, ...] = (
 
 def main() -> None:
     from app.config import get_settings
-    from app.eval.metrics import mean_reciprocal_rank, precision_at_k
     from app.retrieval.service import RetrievalService
 
     parser = argparse.ArgumentParser(description="Run the golden retrieval set.")
@@ -121,14 +120,15 @@ def main() -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
     json_path = args.out_dir / f"retrieval_eval_{run_id}.json"
     md_path = args.out_dir / f"retrieval_eval_{run_id}.md"
-    json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    md_path.write_text(_markdown_report(report), encoding="utf-8")
+    json_report = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
+    markdown_report = _markdown_report(report)
+    json_path.write_text(json_report, encoding="utf-8")
+    md_path.write_text(markdown_report, encoding="utf-8")
 
     latest_json = args.out_dir / "latest.json"
     latest_md = args.out_dir / "latest.md"
-    latest_payload = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
-    latest_json.write_text(latest_payload, encoding="utf-8")
-    latest_md.write_text(_markdown_report(report), encoding="utf-8")
+    latest_json.write_text(json_report, encoding="utf-8")
+    latest_md.write_text(markdown_report, encoding="utf-8")
 
     print(f"Wrote {json_path}")
     print(f"Wrote {md_path}")
@@ -238,6 +238,27 @@ def _markdown_report(report: dict[str, Any]) -> str:
 
     lines.append("")
     return "\n".join(lines)
+
+
+def precision_at_k(retrieved_ids: list[str], expected_ids: set[str], *, k: int) -> float:
+    if k <= 0:
+        raise ValueError("k must be positive")
+    if not expected_ids:
+        return 0.0
+
+    top_k = retrieved_ids[:k]
+    hits = sum(1 for item_id in top_k if item_id in expected_ids)
+    return hits / k
+
+
+def mean_reciprocal_rank(retrieved_ids: list[str], expected_ids: set[str]) -> float:
+    if not expected_ids:
+        return 0.0
+
+    for index, item_id in enumerate(retrieved_ids, start=1):
+        if item_id in expected_ids:
+            return 1.0 / index
+    return 0.0
 
 
 if __name__ == "__main__":

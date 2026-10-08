@@ -2,23 +2,24 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Literal
 
 from app.config import Settings, get_settings
-from app.retrieval.bm25 import BM25Retriever
+from app.retrieval.bm25 import (
+    BM25Retriever,
+    normalize_legal_unit,
+    query_law_codes,
+    query_legal_units,
+)
 from app.retrieval.dense import DenseRetriever
 from app.retrieval.embeddings import EmbeddingModel
-from app.retrieval.hybrid import fuse_retrieval_results
-from app.retrieval.models import ScoredChunk
+from app.retrieval.models import ChunkStore, ScoredChunk
 from app.retrieval.rerank import CrossEncoderReranker
-from app.retrieval.store import ChunkStore
 
 RetrievalMode = Literal["dense", "bm25", "hybrid"]
 RETRIEVAL_MODES: tuple[RetrievalMode, ...] = ("dense", "bm25", "hybrid")
-_LEGAL_UNIT_RE = re.compile(r"(§+\s*\d+[a-zA-Z]*|art\.?\s*\d+[a-zA-Z]*)", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -32,7 +33,6 @@ class IndexStats:
 
 class RetrievalService:
     def __init__(self, settings: Settings) -> None:
-        self._settings = settings
         self._candidate_pool = settings.retrieval_candidate_pool
         self._store = ChunkStore.from_jsonl(settings.index_chunks_path)
         self._bm25 = BM25Retriever(self._store.chunks)
@@ -102,11 +102,11 @@ class RetrievalService:
 
         # BM25 has no metadata filter, so filter a wider result set here.
         raw = self._bm25.search(query, top_k=fetch_n * 5)
-        filtered = [
-            (chunk_id, score)
-            for chunk_id, score in raw
-            if (chunk := self._store.get(chunk_id)) and chunk.law_code == law_code
-        ]
+        filtered = []
+        for chunk_id, score in raw:
+            chunk = self._store.get(chunk_id)
+            if chunk is not None and chunk.law_code == law_code:
+                filtered.append((chunk_id, score))
         return filtered[:fetch_n]
 
     def _hybrid_search(
@@ -118,16 +118,16 @@ class RetrievalService:
         bm25_ids = [
             chunk_id for chunk_id, _ in self._bm25_search(query, self._candidate_pool, law_code)
         ]
-        return fuse_retrieval_results(dense_ids, bm25_ids, limit=fetch_n)
+        return reciprocal_rank_fusion([dense_ids, bm25_ids], limit=fetch_n)
 
     def _apply_rerank(
         self, query: str, ranked: list[tuple[str, float]], top_k: int
     ) -> list[tuple[str, float]]:
-        candidates = [
-            (chunk_id, chunk.text)
-            for chunk_id, _ in ranked
-            if (chunk := self._store.get(chunk_id)) is not None
-        ]
+        candidates = []
+        for chunk_id, _ in ranked:
+            chunk = self._store.get(chunk_id)
+            if chunk is not None:
+                candidates.append((chunk_id, chunk.text))
         return self._reranker.rerank(query, candidates, top_k=top_k)
 
     def _to_scored_chunks(self, ranked: list[tuple[str, float]], method: str) -> list[ScoredChunk]:
@@ -144,18 +144,18 @@ class RetrievalService:
         ranked: list[tuple[str, float]],
         law_code: str | None,
     ) -> list[tuple[str, float]]:
-        query_units = _query_legal_units(query)
-        query_law_codes = _query_law_codes(query, [chunk.law_code for chunk in self._store.chunks])
+        query_units = query_legal_units(query)
+        law_codes = query_law_codes(query, [chunk.law_code for chunk in self._store.chunks])
         if law_code:
-            query_law_codes.add(law_code.casefold())
-        if not query_units or not query_law_codes:
+            law_codes.add(law_code.casefold())
+        if not query_units or not law_codes:
             return ranked
 
         exact_ids = [
             chunk.chunk_id
             for chunk in self._store.chunks
-            if chunk.law_code.casefold() in query_law_codes
-            and _normalize_legal_unit(chunk.citation) in query_units
+            if chunk.law_code.casefold() in law_codes
+            and normalize_legal_unit(chunk.citation) in query_units
         ]
         if not exact_ids:
             return ranked
@@ -168,25 +168,19 @@ class RetrievalService:
 
 @lru_cache
 def get_retrieval_service() -> RetrievalService:
-    """Process-wide singleton. Built on first request, not at import time, so the
-    test suite and `/health` stay fast. Failures (Qdrant down, missing index)
-    propagate and are not cached, so a later request can succeed."""
+    """Load the index on first use so startup and health checks stay lightweight."""
     return RetrievalService(get_settings())
 
 
-def _query_law_codes(query: str, law_codes: list[str]) -> set[str]:
-    query_folded = query.casefold()
-    known_codes = {code.casefold() for code in law_codes if code}
-    return {code for code in known_codes if re.search(rf"\b{re.escape(code)}\b", query_folded)}
+def reciprocal_rank_fusion(
+    ranked_lists: list[list[str]],
+    *,
+    k: int = 60,
+    limit: int = 10,
+) -> list[tuple[str, float]]:
+    scores: dict[str, float] = {}
+    for ranked_ids in ranked_lists:
+        for rank, item_id in enumerate(ranked_ids, start=1):
+            scores[item_id] = scores.get(item_id, 0.0) + 1.0 / (k + rank)
 
-
-def _query_legal_units(query: str) -> set[str]:
-    return {_normalize_legal_unit(match.group(1)) for match in _LEGAL_UNIT_RE.finditer(query)}
-
-
-def _normalize_legal_unit(value: str) -> str:
-    match = _LEGAL_UNIT_RE.search(value)
-    if not match:
-        return ""
-    unit = match.group(1).casefold().replace(".", "")
-    return re.sub(r"\s+", " ", unit).strip()
+    return sorted(scores.items(), key=lambda item: item[1], reverse=True)[:limit]

@@ -12,9 +12,42 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR / "backend"))
 
 
+CURATED_LAW_SLUGS = {
+    "gg",
+    "bgb",
+    "stgb",
+    "stpo",
+    "zpo",
+    "hgb",
+    "ao_1977",
+    "owig_1968",
+    "gmbhg",
+    "aktg",
+    "estg",
+    "ustg_1980",
+    "arbgg",
+    "betrvg",
+    "kschg",
+    "bdsg_2018",
+    "vwvfg",
+    "vwgo",
+    "gvg",
+    "urhg",
+    "patg",
+    "tvg",
+    "stvg",
+    "inso",
+    "bbg_2009",
+    "bbaug",
+    "sgb_1",
+    "sgb_2",
+    "sgb_3",
+    "sgb_5",
+}
+
+
 def main() -> None:
     from app.config import get_settings
-    from app.ingestion.curated import CURATED_LAW_SLUGS
     from app.retrieval.dense import DenseRetriever
     from app.retrieval.embeddings import EmbeddingModel
 
@@ -128,8 +161,6 @@ def _upsert_with_retry(
 
 
 def _load_chunks(path: Path, *, curated_only: bool, limit: int | None) -> list[dict]:
-    from app.ingestion.curated import is_curated_slug
-
     records: list[dict] = []
     with path.open(encoding="utf-8") as handle:
         for line in handle:
@@ -138,7 +169,7 @@ def _load_chunks(path: Path, *, curated_only: bool, limit: int | None) -> list[d
                 continue
             record = json.loads(line)
             slug = record.get("metadata", {}).get("slug")
-            if curated_only and not is_curated_slug(slug):
+            if curated_only and slug not in CURATED_LAW_SLUGS:
                 continue
             records.append(record)
             if limit is not None and len(records) >= limit:

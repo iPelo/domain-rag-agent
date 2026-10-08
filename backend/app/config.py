@@ -10,25 +10,19 @@ class Settings(BaseSettings):
     app_env: str = "local"
     domain_name: str = "GermanLawRAG"
 
-    api_host: str = "0.0.0.0"
-    api_port: int = 8000
-
     qdrant_url: str = "http://localhost:6333"
     qdrant_collection: str = "german_law_chunks"
 
-    data_raw_dir: Path = Path("data/raw/german-laws")
     data_processed_dir: Path = Path("data/processed")
 
     index_chunks_path: Path = Path("data/processed/chunks.curated.jsonl")
 
     embedding_model: str = "BAAI/bge-m3"
-    embedding_dim: int = 1024
     embedding_batch_size: int = 32
 
     embedding_device: str | None = None
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
 
-    retrieval_default_top_k: int = 5
     retrieval_candidate_pool: int = 30
 
     model_provider: str = "hosted"

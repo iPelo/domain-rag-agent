@@ -53,25 +53,20 @@ def chunk_text(
     if not text:
         return
 
-    cursor = 0
-    index = 0
-    while cursor < len(text):
-        end = min(cursor + chunk_size, len(text))
-        chunk_body = text[cursor:end].strip()
-        if chunk_body:
-            yield DocumentChunk(
-                chunk_id=f"{document.source_id}::chunk-{index:05d}",
-                source_id=document.source_id,
-                title=document.title,
-                text=chunk_body,
-                start_char=cursor,
-                end_char=end,
-                metadata=document.metadata,
-            )
-        if end == len(text):
-            break
-        cursor = end - overlap
-        index += 1
+    for index, (cursor, end, body) in enumerate(
+        _text_windows(text, chunk_size=chunk_size, overlap=overlap)
+    ):
+        if not body:
+            continue
+        yield DocumentChunk(
+            chunk_id=f"{document.source_id}::chunk-{index:05d}",
+            source_id=document.source_id,
+            title=document.title,
+            text=body,
+            start_char=cursor,
+            end_char=end,
+            metadata=document.metadata,
+        )
 
 
 def chunk_recursive(
@@ -82,9 +77,8 @@ def chunk_recursive(
 ) -> Iterable[DocumentChunk]:
     """Split on a separator hierarchy (paragraph -> line -> sentence -> word).
 
-    Unlike fixed-size chunking this avoids cutting mid-sentence, and unlike
-    legal-heading chunking it needs no structural markup — a useful baseline for
-    the comparison in docs/decisions.md.
+    Try paragraphs, lines, sentences, then words before splitting by character.
+    Used as a baseline by the chunking comparison script.
     """
     if chunk_size <= 0:
         raise ValueError("chunk_size must be positive")
@@ -273,14 +267,20 @@ def _split_text(text: str, *, chunk_size: int, overlap: int) -> Iterable[str]:
         yield text
         return
 
-    pseudo_doc = RawDocument(
-        source_id="split",
-        title="split",
-        text=text,
-        source_path="",
-    )
-    for chunk in chunk_text(pseudo_doc, chunk_size=chunk_size, overlap=overlap):
-        yield chunk.text
+    for _, _, body in _text_windows(text, chunk_size=chunk_size, overlap=overlap):
+        if body:
+            yield body
+
+
+def _text_windows(text: str, *, chunk_size: int, overlap: int) -> Iterable[tuple[int, int, str]]:
+    if chunk_size <= 0 or overlap < 0 or overlap >= chunk_size:
+        raise ValueError("chunk_size must be positive and 0 <= overlap < chunk_size")
+    for start in range(0, len(text), chunk_size - overlap):
+        end = min(start + chunk_size, len(text))
+        body = text[start:end].strip()
+        yield start, end, body
+        if end == len(text):
+            break
 
 
 def _unique_chunk_id(base_id: str, seen_chunk_ids: set[str], *, split_index: int) -> str:

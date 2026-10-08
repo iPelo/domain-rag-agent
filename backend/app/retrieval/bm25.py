@@ -33,7 +33,6 @@ class BM25Retriever:
         if not chunks:
             raise ValueError("BM25Retriever needs a non-empty chunk list.")
         self._chunks = chunks
-        self._chunk_ids = [chunk.chunk_id for chunk in chunks]
         self._index = BM25Okapi([tokenize(_searchable_text(chunk)) for chunk in chunks])
 
     def search(self, query: str, *, top_k: int = 10) -> list[tuple[str, float]]:
@@ -41,12 +40,12 @@ class BM25Retriever:
         query_tokens = tokenize(query)
         if not query_tokens:
             return []
-        query_law_codes = _query_law_codes(query, self._chunks)
-        query_units = _query_legal_units(query)
+        law_codes = query_law_codes(query, [chunk.law_code for chunk in self._chunks])
+        query_units = query_legal_units(query)
         scores = self._index.get_scores(query_tokens)
         ranked = sorted(
             (
-                (chunk.chunk_id, _boosted_score(chunk, float(score), query_law_codes, query_units))
+                (chunk.chunk_id, _boosted_score(chunk, float(score), law_codes, query_units))
                 for chunk, score in zip(self._chunks, scores, strict=True)
             ),
             key=lambda item: item[1],
@@ -91,14 +90,14 @@ def _searchable_text(chunk: IndexedChunk) -> str:
     )
 
 
-def _query_law_codes(query: str, chunks: list[IndexedChunk]) -> set[str]:
+def query_law_codes(query: str, law_codes: list[str]) -> set[str]:
     query_folded = query.casefold()
-    known_codes = {chunk.law_code.casefold() for chunk in chunks if chunk.law_code}
+    known_codes = {code.casefold() for code in law_codes if code}
     return {code for code in known_codes if re.search(rf"\b{re.escape(code)}\b", query_folded)}
 
 
-def _query_legal_units(query: str) -> set[str]:
-    return {_normalize_legal_unit(match.group(1)) for match in _LEGAL_UNIT_RE.finditer(query)}
+def query_legal_units(query: str) -> set[str]:
+    return {normalize_legal_unit(match.group(1)) for match in _LEGAL_UNIT_RE.finditer(query)}
 
 
 def _boosted_score(
@@ -109,12 +108,12 @@ def _boosted_score(
 ) -> float:
     if query_law_codes and chunk.law_code.casefold() in query_law_codes:
         score += 25.0
-    if query_units and _normalize_legal_unit(chunk.citation) in query_units:
+    if query_units and normalize_legal_unit(chunk.citation) in query_units:
         score += 25.0
     return score
 
 
-def _normalize_legal_unit(value: str) -> str:
+def normalize_legal_unit(value: str) -> str:
     match = _LEGAL_UNIT_RE.search(value)
     if not match:
         return ""

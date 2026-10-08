@@ -65,3 +65,36 @@ def test_recursive_chunking_keeps_chunks_bounded() -> None:
     assert chunks
     assert all(len(chunk.text) <= 48 for chunk in chunks)
     assert len({chunk.text for chunk in chunks}) == len(chunks)
+
+
+def test_fixed_chunks_keep_offsets_overlap_and_ids() -> None:
+    document = RawDocument(
+        source_id="test", title="Test", text="abcdefghijklm", source_path="test.txt"
+    )
+    chunks = list(chunk_document(document, strategy="fixed", chunk_size=6, overlap=2))
+
+    assert [chunk.text for chunk in chunks] == ["abcdef", "efghij", "ijklm"]
+    assert [(chunk.start_char, chunk.end_char) for chunk in chunks] == [(0, 6), (4, 10), (8, 13)]
+    assert [chunk.chunk_id for chunk in chunks] == [
+        "test::chunk-00000",
+        "test::chunk-00001",
+        "test::chunk-00002",
+    ]
+
+
+def test_long_legal_section_keeps_citation_and_part_ids() -> None:
+    document = RawDocument(
+        source_id="german-laws::gg",
+        title="Grundgesetz",
+        text="# Grundgesetz\n\n## Art 5\n\n" + "Meinungsfreiheit " * 20,
+        source_path="index.md",
+        metadata={"dataset": "bundestag/gesetze", "law_code": "GG"},
+    )
+    chunks = list(chunk_document(document, chunk_size=60, overlap=10))
+
+    assert len(chunks) > 1
+    assert chunks[0].chunk_id == "german-laws::gg::art-5"
+    assert chunks[1].chunk_id == "german-laws::gg::art-5-part-02"
+    assert all(len(chunk.text) <= 60 for chunk in chunks)
+    assert all(chunk.metadata["citation"] == "GG Art 5" for chunk in chunks)
+    assert chunks[0].text[-10:] == chunks[1].text[:10]
