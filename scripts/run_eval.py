@@ -49,6 +49,7 @@ def build_configs(*, boost: str, include_rerank: bool) -> list[RetrievalConfig]:
 
 def main() -> None:
     from app.config import get_settings
+    from app.retrieval.index_info import describe_index
     from app.retrieval.service import RetrievalService
 
     parser = argparse.ArgumentParser(description="Run the golden retrieval set.")
@@ -79,7 +80,8 @@ def main() -> None:
 
     configs = build_configs(boost=args.boost, include_rerank=args.include_rerank)
 
-    service = RetrievalService(get_settings())
+    settings = get_settings()
+    service = RetrievalService(settings)
     qdrant_ready, qdrant_error = _qdrant_ready(service)
     run_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     report: dict[str, Any] = {
@@ -90,6 +92,7 @@ def main() -> None:
         "unanswerable_cases": unanswerable_count,
         "top_k": args.top_k,
         "ndcg_k": NDCG_K,
+        "index": describe_index(settings.index_chunks_path),
         "results": {},
     }
 
@@ -193,6 +196,15 @@ def _validate_case(case: dict[str, Any], line_number: int) -> None:
         raise SystemExit(f"golden set line {line_number}: expected_source_chunks must be a list.")
 
 
+def _index_line(index: dict[str, Any] | None) -> str:
+    if not index:
+        return "- Index: not recorded"
+    return (
+        f"- Index: {index['scope']} ({index['law_count']} laws, {index['chunk_count']:,} chunks; "
+        f"scope {index['scope_source']})"
+    )
+
+
 def score_case(case: dict[str, Any], retrieved_ids: list[str], *, top_k: int) -> dict[str, Any]:
     from app.evaluation.metrics import (
         hit_at_k,
@@ -247,6 +259,7 @@ def _markdown_report(report: dict[str, Any]) -> str:
         f"({report.get('answerable_cases', report['case_count'])} answerable, "
         f"{report.get('unanswerable_cases', 0)} unanswerable; only answerable cases are scored)",
         f"- Top-k: {report['top_k']}",
+        _index_line(report.get("index")),
         "",
         "## Summary",
         "",

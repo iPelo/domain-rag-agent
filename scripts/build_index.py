@@ -6,50 +6,22 @@ import argparse
 import json
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR / "backend"))
 
 
-CURATED_LAW_SLUGS = {
-    "gg",
-    "bgb",
-    "stgb",
-    "stpo",
-    "zpo",
-    "hgb",
-    "ao_1977",
-    "owig_1968",
-    "gmbhg",
-    "aktg",
-    "estg",
-    "ustg_1980",
-    "arbgg",
-    "betrvg",
-    "kschg",
-    "bdsg_2018",
-    "vwvfg",
-    "vwgo",
-    "gvg",
-    "urhg",
-    "patg",
-    "tvg",
-    "stvg",
-    "inso",
-    "bbg_2009",
-    "bbaug",
-    "sgb_1",
-    "sgb_2",
-    "sgb_3",
-    "sgb_5",
-}
-
-
 def main() -> None:
     from app.config import get_settings
     from app.retrieval.dense import DenseRetriever
     from app.retrieval.embeddings import EmbeddingModel
+    from app.retrieval.index_info import (
+        CURATED_LAW_SLUGS,
+        manifest_path,
+        write_manifest,
+    )
 
     settings = get_settings()
 
@@ -83,7 +55,11 @@ def main() -> None:
     if not args.chunks.exists():
         raise SystemExit(f"{args.chunks} not found — run `make chunks` first.")
 
-    selected = _load_chunks(args.chunks, curated_only=not args.all, limit=args.limit)
+    selected = _load_chunks(
+        args.chunks,
+        curated_slugs=None if args.all else CURATED_LAW_SLUGS,
+        limit=args.limit,
+    )
     if not selected:
         raise SystemExit("No chunks selected — check --chunks / curated slug list.")
 
@@ -91,6 +67,8 @@ def main() -> None:
     print(f"Selected {len(selected):,} chunks ({scope}).")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
+    # Drop any previous manifest so a failed build cannot leave a stale one behind.
+    manifest_path(args.out).unlink(missing_ok=True)
     with args.out.open("w", encoding="utf-8") as handle:
         for record in selected:
             handle.write(json.dumps(record, ensure_ascii=False) + "\n")
@@ -132,6 +110,21 @@ def main() -> None:
         )
     print(f"Done in {elapsed:.0f}s. Qdrant points: {point_count:,}")
 
+    manifest = write_manifest(
+        args.out,
+        {
+            "scope": "all" if args.all else "curated",
+            "limit": args.limit,
+            "chunk_count": len(selected),
+            "law_count": len({record.get("metadata", {}).get("slug") for record in selected}),
+            "source_chunks": str(args.chunks),
+            "embedding_model": settings.embedding_model,
+            "qdrant_collection": settings.qdrant_collection,
+            "built_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        },
+    )
+    print(f"Wrote index manifest -> {manifest}")
+
 
 def _upsert_with_retry(
     retriever,
@@ -160,7 +153,9 @@ def _upsert_with_retry(
             retriever.reconnect()
 
 
-def _load_chunks(path: Path, *, curated_only: bool, limit: int | None) -> list[dict]:
+def _load_chunks(
+    path: Path, *, curated_slugs: frozenset[str] | None, limit: int | None
+) -> list[dict]:
     records: list[dict] = []
     with path.open(encoding="utf-8") as handle:
         for line in handle:
@@ -169,7 +164,7 @@ def _load_chunks(path: Path, *, curated_only: bool, limit: int | None) -> list[d
                 continue
             record = json.loads(line)
             slug = record.get("metadata", {}).get("slug")
-            if curated_only and slug not in CURATED_LAW_SLUGS:
+            if curated_slugs is not None and slug not in curated_slugs:
                 continue
             records.append(record)
             if limit is not None and len(records) >= limit:
