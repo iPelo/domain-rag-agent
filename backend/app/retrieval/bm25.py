@@ -35,8 +35,18 @@ class BM25Retriever:
         self._chunks = chunks
         self._index = BM25Okapi([tokenize(_searchable_text(chunk)) for chunk in chunks])
 
-    def search(self, query: str, *, top_k: int = 10) -> list[tuple[str, float]]:
-        """Return `(chunk_id, bm25_score)` for the best-matching chunks."""
+    def search(
+        self,
+        query: str,
+        *,
+        top_k: int = 10,
+        law_code: str | None = None,
+    ) -> list[tuple[str, float]]:
+        """Return `(chunk_id, bm25_score)` for the best-matching chunks.
+
+        With `law_code`, chunks from other laws are dropped before ranking, so a
+        small law is not crowded out by higher-scoring chunks from large ones.
+        """
         query_tokens = tokenize(query)
         if not query_tokens:
             return []
@@ -47,6 +57,7 @@ class BM25Retriever:
             (
                 (chunk.chunk_id, _boosted_score(chunk, float(score), law_codes, query_units))
                 for chunk, score in zip(self._chunks, scores, strict=True)
+                if not law_code or chunk.law_code == law_code
             ),
             key=lambda item: item[1],
             reverse=True,

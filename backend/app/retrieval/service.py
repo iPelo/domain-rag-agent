@@ -97,17 +97,7 @@ class RetrievalService:
     def _bm25_search(
         self, query: str, fetch_n: int, law_code: str | None
     ) -> list[tuple[str, float]]:
-        if not law_code:
-            return self._bm25.search(query, top_k=fetch_n)
-
-        # BM25 has no metadata filter, so filter a wider result set here.
-        raw = self._bm25.search(query, top_k=fetch_n * 5)
-        filtered = []
-        for chunk_id, score in raw:
-            chunk = self._store.get(chunk_id)
-            if chunk is not None and chunk.law_code == law_code:
-                filtered.append((chunk_id, score))
-        return filtered[:fetch_n]
+        return self._bm25.search(query, top_k=fetch_n, law_code=law_code)
 
     def _hybrid_search(
         self, query: str, fetch_n: int, law_code: str | None

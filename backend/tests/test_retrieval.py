@@ -57,6 +57,25 @@ def test_bm25_uses_law_code_and_citation_metadata() -> None:
     assert results[0][0] == "german-laws::stgb::sec-242"
 
 
+def test_bm25_law_filter_applies_before_ranking() -> None:
+    # Many strong BGB matches would fill any global top-k window before the
+    # single, weaker KSchG match is reached.
+    chunks = [
+        _chunk(f"german-laws::bgb::sec-{index}", "Kündigung Kündigung Kündigung", "BGB")
+        for index in range(60)
+    ]
+    chunks.append(
+        _chunk("german-laws::kschg::sec-1", "Sozial ungerechtfertigte Kündigung", "KSchG")
+    )
+
+    retriever = BM25Retriever(chunks)
+    unfiltered = [chunk_id for chunk_id, _ in retriever.search("Kündigung", top_k=5)]
+    filtered = retriever.search("Kündigung", top_k=1, law_code="KSchG")
+
+    assert "german-laws::kschg::sec-1" not in unfiltered
+    assert [chunk_id for chunk_id, _ in filtered] == ["german-laws::kschg::sec-1"]
+
+
 def test_bm25_empty_query_returns_nothing() -> None:
     retriever = BM25Retriever([_chunk("a", "irgendein Text")])
     assert retriever.search("   ") == []
