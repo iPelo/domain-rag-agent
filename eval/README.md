@@ -1,7 +1,18 @@
 # Retrieval evaluation
 
-`golden_set.jsonl` contains 44 manually selected questions with expected chunk IDs
+`golden_set.jsonl` contains 96 manually written questions with expected chunk IDs
 and answer text. The evaluation checks retrieved IDs, not the answer text.
+
+| Category | Cases | What it tests |
+|---|---:|---|
+| original (no `category` field) | 44 | Direct questions, mostly one section each |
+| `colloquial` | 21 | Everyday wording with few legal terms ("Mein Vermieter will mir kündigen...") |
+| `multi_section` | 19 | Answers that need 2-3 sections, e.g. Mord vs. Totschlag (§§ 211, 212 StGB) |
+| `unanswerable` | 12 | State law, foreign law, or non-legal questions; `expected_source_chunks` is empty |
+
+Every expected chunk ID was checked against the curated 30-law chunk file built
+from the `bundestag/gesetze` snapshot, and expected answers follow that snapshot's
+text. Newer versions of a law may differ.
 
 After building the corpus and Qdrant index, run:
 
