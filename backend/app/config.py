@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
 
     retrieval_candidate_pool: int = 30
+    # Prefer chunks whose law code and section/article match an explicit
+    # reference in the query (e.g. "§ 242 StGB"). Turn off to measure plain ranking.
+    exact_reference_boost: bool = True
 
     model_provider: str = "hosted"
     model_name: str | None = None

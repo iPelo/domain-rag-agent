@@ -80,3 +80,24 @@ def test_reranking_receives_text_and_sets_result_method(service, monkeypatch):
     assert ("german-laws::bgb::sec-433", "Der Verkäufer muss die Sache übergeben.") in received
     assert results[0].chunk.chunk_id == "german-laws::bgb::sec-433"
     assert results[0].method == "hybrid+rerank"
+
+
+def test_exact_boost_can_be_disabled_per_call(service):
+    boosted = service.retrieve("Art. 5 GG", mode="dense", top_k=3, exact_boost=True)
+    plain = service.retrieve("Art. 5 GG", mode="dense", top_k=3, exact_boost=False)
+
+    assert boosted[0].chunk.chunk_id == "german-laws::gg::art-5"
+    # Without the boost, dense order follows vector similarity only.
+    assert [result.chunk.chunk_id for result in plain] == [
+        "german-laws::gg::art-1",
+        "german-laws::bgb::sec-433",
+        "german-laws::gg::art-5",
+    ]
+
+
+def test_exact_boost_setting_is_the_default(service, monkeypatch):
+    monkeypatch.setattr(service, "_exact_boost", False)
+
+    results = service.retrieve("Art. 5 GG", mode="dense", top_k=3)
+
+    assert results[0].chunk.chunk_id == "german-laws::gg::art-1"

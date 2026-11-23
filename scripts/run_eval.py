@@ -23,13 +23,28 @@ class RetrievalConfig:
     name: str
     mode: str
     rerank: bool = False
+    exact_boost: bool = True
 
 
-DEFAULT_CONFIGS: tuple[RetrievalConfig, ...] = (
-    RetrievalConfig("bm25", "bm25"),
-    RetrievalConfig("dense", "dense"),
-    RetrievalConfig("hybrid", "hybrid"),
-)
+BASE_MODES: tuple[str, ...] = ("bm25", "dense", "hybrid")
+
+
+def build_configs(*, boost: str, include_rerank: bool) -> list[RetrievalConfig]:
+    """One config per mode and boost setting; `boost` is "on", "off" or "both"."""
+    boost_values = {"on": [True], "off": [False], "both": [True, False]}[boost]
+    modes = [(mode, mode, False) for mode in BASE_MODES]
+    if include_rerank:
+        modes.append(("hybrid_rerank", "hybrid", True))
+    return [
+        RetrievalConfig(
+            name if exact_boost else f"{name}_no_boost",
+            mode,
+            rerank=rerank,
+            exact_boost=exact_boost,
+        )
+        for exact_boost in boost_values
+        for name, mode, rerank in modes
+    ]
 
 
 def main() -> None:
@@ -45,15 +60,19 @@ def main() -> None:
         action="store_true",
         help="Also score hybrid+rerank. This loads the reranker model.",
     )
+    parser.add_argument(
+        "--boost",
+        choices=("on", "off", "both"),
+        default="both",
+        help="Run with the exact-reference boost on, off, or both (default).",
+    )
     args = parser.parse_args()
 
     cases = _load_cases(args.golden_set)
     if not cases:
         raise SystemExit(f"{args.golden_set} is empty.")
 
-    configs = list(DEFAULT_CONFIGS)
-    if args.include_rerank:
-        configs.append(RetrievalConfig("hybrid_rerank", "hybrid", rerank=True))
+    configs = build_configs(boost=args.boost, include_rerank=args.include_rerank)
 
     service = RetrievalService(get_settings())
     qdrant_ready, qdrant_error = _qdrant_ready(service)
@@ -71,6 +90,7 @@ def main() -> None:
             report["results"][config.name] = {
                 "mode": config.mode,
                 "rerank": config.rerank,
+                "exact_boost": config.exact_boost,
                 "summary": _summarize([], total_cases=len(cases)),
                 "errors": [qdrant_error or "Qdrant collection is not ready."],
                 "cases": [],
@@ -87,6 +107,7 @@ def main() -> None:
                     mode=config.mode,  # type: ignore[arg-type]
                     top_k=args.top_k,
                     rerank=config.rerank,
+                    exact_boost=config.exact_boost,
                 )
             except Exception as exc:  # noqa: BLE001 - report unavailable configs cleanly
                 errors.append(f"{case['id']}: {type(exc).__name__}: {exc}")
@@ -112,6 +133,7 @@ def main() -> None:
         report["results"][config.name] = {
             "mode": config.mode,
             "rerank": config.rerank,
+            "exact_boost": config.exact_boost,
             "summary": _summarize(rows, total_cases=len(cases)),
             "errors": errors,
             "cases": rows,
@@ -208,17 +230,19 @@ def _markdown_report(report: dict[str, Any]) -> str:
         "",
         "## Summary",
         "",
-        "| Config | Completed | Hit rate | Mean precision@k | Mean MRR | Errors |",
-        "|---|---:|---:|---:|---:|---:|",
+        "| Config | Boost | Completed | Hit rate | Mean precision@k | Mean MRR | Errors |",
+        "|---|---|---:|---:|---:|---:|---:|",
     ]
     for name, result in report["results"].items():
         summary = result["summary"]
         row_format = (
-            "| {name} | {completed}/{total} | {hit:.3f} | {precision:.3f} | {mrr:.3f} | {errors} |"
+            "| {name} | {boost} | {completed}/{total} | {hit:.3f} | {precision:.3f} | "
+            "{mrr:.3f} | {errors} |"
         )
         lines.append(
             row_format.format(
                 name=name,
+                boost="on" if result.get("exact_boost", True) else "off",
                 completed=summary["completed_cases"],
                 total=summary["total_cases"],
                 hit=summary["hit_rate"],

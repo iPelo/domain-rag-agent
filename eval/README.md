@@ -12,7 +12,10 @@ uv run python scripts/run_eval.py --include-rerank
 ```
 
 The report compares BM25, dense, and hybrid search using hit rate, precision at k,
-and mean reciprocal rank. Reports are written to `results/`; the repository keeps
+and mean reciprocal rank. Each mode runs twice: with the exact-reference boost
+(chunks matching a law code and section named in the query, such as `§ 242 StGB`,
+are ranked first) and without it (`*_no_boost`). Use `--boost on` or `--boost off`
+to run only one. The API uses the `EXACT_REFERENCE_BOOST` setting. Reports are written to `results/`; the repository keeps
 a [saved report](results/latest.md) and its per-question [JSON results](results/latest.json).
 Check completed-case counts and errors before comparing scores. These results
 measure retrieval on a small set, not the correctness of generated legal answers.

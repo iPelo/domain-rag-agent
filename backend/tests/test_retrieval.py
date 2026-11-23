@@ -148,3 +148,17 @@ def test_reranker_does_not_load_for_empty_candidates() -> None:
     reranker = CrossEncoderReranker("BAAI/bge-reranker-v2-m3")
     assert reranker.rerank("query", []) == []
     assert reranker._model is None
+
+
+def test_bm25_boost_flag_removes_reference_bonus() -> None:
+    chunks = [
+        _chunk("german-laws::bgb::sec-242", "Leistung nach Treu und Glauben", "BGB"),
+        _chunk("german-laws::stgb::sec-242", "Diebstahl", "StGB"),
+    ]
+    retriever = BM25Retriever(chunks)
+
+    boosted = dict(retriever.search("§ 242 StGB", top_k=2))
+    plain = dict(retriever.search("§ 242 StGB", top_k=2, boost=False))
+
+    assert boosted["german-laws::stgb::sec-242"] - plain["german-laws::stgb::sec-242"] >= 25.0
+    assert boosted["german-laws::bgb::sec-242"] == plain["german-laws::bgb::sec-242"]

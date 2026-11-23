@@ -41,17 +41,23 @@ class BM25Retriever:
         *,
         top_k: int = 10,
         law_code: str | None = None,
+        boost: bool = True,
     ) -> list[tuple[str, float]]:
         """Return `(chunk_id, bm25_score)` for the best-matching chunks.
 
         With `law_code`, chunks from other laws are dropped before ranking, so a
         small law is not crowded out by higher-scoring chunks from large ones.
+        With `boost`, chunks matching a law code or section named in the query
+        get a fixed bonus.
         """
         query_tokens = tokenize(query)
         if not query_tokens:
             return []
-        law_codes = query_law_codes(query, [chunk.law_code for chunk in self._chunks])
-        query_units = query_legal_units(query)
+        if boost:
+            law_codes = query_law_codes(query, [chunk.law_code for chunk in self._chunks])
+            query_units = query_legal_units(query)
+        else:
+            law_codes, query_units = set(), set()
         scores = self._index.get_scores(query_tokens)
         ranked = sorted(
             (

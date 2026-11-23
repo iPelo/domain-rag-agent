@@ -34,6 +34,7 @@ class IndexStats:
 class RetrievalService:
     def __init__(self, settings: Settings) -> None:
         self._candidate_pool = settings.retrieval_candidate_pool
+        self._exact_boost = settings.exact_reference_boost
         self._store = ChunkStore.from_jsonl(settings.index_chunks_path)
         self._bm25 = BM25Retriever(self._store.chunks)
         self._dense = DenseRetriever(settings.qdrant_url, settings.qdrant_collection)
@@ -65,21 +66,25 @@ class RetrievalService:
         top_k: int = 5,
         rerank: bool = False,
         law_code: str | None = None,
+        exact_boost: bool | None = None,
     ) -> list[ScoredChunk]:
+        """Retrieve chunks; `exact_boost=None` uses the EXACT_REFERENCE_BOOST setting."""
         query = query.strip()
         if not query:
             return []
 
+        boost = self._exact_boost if exact_boost is None else exact_boost
         fetch_n = self._candidate_pool if rerank else top_k
 
         if mode == "dense":
             ranked = self._dense_search(query, fetch_n, law_code)
         elif mode == "bm25":
-            ranked = self._bm25_search(query, fetch_n, law_code)
+            ranked = self._bm25_search(query, fetch_n, law_code, boost=boost)
         else:
-            ranked = self._hybrid_search(query, fetch_n, law_code)
+            ranked = self._hybrid_search(query, fetch_n, law_code, boost=boost)
 
-        ranked = self._prepend_exact_reference_matches(query, ranked, law_code)
+        if boost:
+            ranked = self._prepend_exact_reference_matches(query, ranked, law_code)
 
         method: str = mode
         if rerank:
@@ -95,18 +100,19 @@ class RetrievalService:
         return self._dense.search(vector, top_k=fetch_n, law_code=law_code)
 
     def _bm25_search(
-        self, query: str, fetch_n: int, law_code: str | None
+        self, query: str, fetch_n: int, law_code: str | None, *, boost: bool
     ) -> list[tuple[str, float]]:
-        return self._bm25.search(query, top_k=fetch_n, law_code=law_code)
+        return self._bm25.search(query, top_k=fetch_n, law_code=law_code, boost=boost)
 
     def _hybrid_search(
-        self, query: str, fetch_n: int, law_code: str | None
+        self, query: str, fetch_n: int, law_code: str | None, *, boost: bool
     ) -> list[tuple[str, float]]:
         dense_ids = [
             chunk_id for chunk_id, _ in self._dense_search(query, self._candidate_pool, law_code)
         ]
         bm25_ids = [
-            chunk_id for chunk_id, _ in self._bm25_search(query, self._candidate_pool, law_code)
+            chunk_id
+            for chunk_id, _ in self._bm25_search(query, self._candidate_pool, law_code, boost=boost)
         ]
         return reciprocal_rank_fusion([dense_ids, bm25_ids], limit=fetch_n)
 
