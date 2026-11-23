@@ -40,6 +40,7 @@ export interface AnswerResponse {
   mode: string;
   rerank: boolean;
   law_code: string | null;
+  no_answer: boolean;
 }
 
 export interface IndexStats {

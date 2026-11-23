@@ -391,6 +391,11 @@ kbd {
   border-color: rgba(91, 157, 255, 0.4);
 }
 
+.badge--no-answer {
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
 .badge--method {
   color: var(--text);
 }
@@ -417,6 +422,15 @@ kbd {
   border-left: 3px solid var(--accent);
   border-radius: 10px;
   padding: 16px;
+}
+
+.answer-panel--no-answer {
+  border-left-color: var(--amber);
+}
+
+.answer-panel__note {
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .answer-panel__header {
