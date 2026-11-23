@@ -80,6 +80,9 @@ class AnswerResponse(BaseModel):
     mode: str
     rerank: bool
     law_code: str | None
+    no_answer: bool = Field(
+        description="True when the sources do not support an answer and none was given."
+    )
 
     @classmethod
     def from_result(cls, result: AnswerResult) -> AnswerResponse:
@@ -91,6 +94,7 @@ class AnswerResponse(BaseModel):
             mode=result.mode,
             rerank=result.rerank,
             law_code=result.law_code,
+            no_answer=result.no_answer,
         )
 
 

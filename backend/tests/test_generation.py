@@ -1,7 +1,12 @@
 from typing import cast
 
 import pytest
-from app.generation.service import CitationValidationError, GenerationService
+from app.generation.service import (
+    GROUNDING_SYSTEM_PROMPT,
+    NO_ANSWER_MARKER,
+    CitationValidationError,
+    GenerationService,
+)
 from app.retrieval.models import IndexedChunk, ScoredChunk
 from app.retrieval.service import RetrievalService
 
@@ -69,6 +74,7 @@ def test_generation_without_sources_returns_unsupported_answer_without_model_cal
     assert result.citations == []
     assert result.sources == []
     assert "not contain enough information" in result.answer
+    assert result.no_answer is True
 
 
 def test_generation_rejects_answers_without_citations() -> None:
@@ -87,6 +93,57 @@ def test_generation_rejects_unknown_chunk_citations() -> None:
 
     with pytest.raises(CitationValidationError):
         service.answer("Welche Pflichten hat der Verkäufer?")
+
+
+def test_system_prompt_asks_for_no_answer_marker() -> None:
+    assert NO_ANSWER_MARKER in GROUNDING_SYSTEM_PROMPT
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [
+        "[NO_ANSWER] Die abgerufenen Quellen enthalten dazu keine ausreichenden Informationen.",
+        "[NO_ANSWER] Dazu geben die Quellen nichts her.",
+        "Leider nicht beantwortbar. [NO_ANSWER]",
+    ],
+)
+def test_generation_accepts_german_refusal_with_marker(reply: str) -> None:
+    source = _scored_chunk("german-laws::bgb::sec-433", "Der Verkäufer muss liefern.")
+    chat = FakeChatClient(reply)
+    service = GenerationService(cast(RetrievalService, FakeRetrievalService([source])), chat)
+
+    result = service.answer("Wie hoch ist die Hundesteuer in Berlin?")
+
+    assert result.no_answer is True
+    assert result.citations == []
+    assert NO_ANSWER_MARKER not in result.answer
+    assert result.answer
+
+
+def test_generation_rejects_german_refusal_without_marker() -> None:
+    source = _scored_chunk("german-laws::bgb::sec-433", "Der Verkäufer muss liefern.")
+    chat = FakeChatClient("Die Quellen enthalten dazu keine ausreichenden Informationen.")
+    service = GenerationService(cast(RetrievalService, FakeRetrievalService([source])), chat)
+
+    with pytest.raises(CitationValidationError):
+        service.answer("Wie hoch ist die Hundesteuer in Berlin?")
+
+
+def test_generation_rejects_unknown_citation_even_with_marker() -> None:
+    source = _scored_chunk("german-laws::bgb::sec-433", "Der Verkäufer muss liefern.")
+    chat = FakeChatClient("[NO_ANSWER] Siehe aber [german-laws::bgb::sec-999].")
+    service = GenerationService(cast(RetrievalService, FakeRetrievalService([source])), chat)
+
+    with pytest.raises(CitationValidationError):
+        service.answer("Wie hoch ist die Hundesteuer in Berlin?")
+
+
+def test_generation_marks_cited_answer_as_answered() -> None:
+    source = _scored_chunk("german-laws::bgb::sec-433", "Der Verkäufer muss liefern.")
+    chat = FakeChatClient("Der Verkäufer muss liefern. [german-laws::bgb::sec-433]")
+    service = GenerationService(cast(RetrievalService, FakeRetrievalService([source])), chat)
+
+    assert service.answer("Welche Pflichten hat der Verkäufer?").no_answer is False
 
 
 def _scored_chunk(chunk_id: str, text: str) -> ScoredChunk:

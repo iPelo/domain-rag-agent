@@ -10,7 +10,8 @@ from app.retrieval.models import ScoredChunk
 from app.retrieval.service import RetrievalMode, RetrievalService
 
 _CITATION_RE = re.compile(r"\[([^\[\]]+)]")
-_UNSUPPORTED_MARKER = "retrieved sources do not contain enough information"
+NO_ANSWER_MARKER = "[NO_ANSWER]"
+NO_SOURCES_ANSWER = "The retrieved sources do not contain enough information to answer."
 
 
 class CitationValidationError(RuntimeError):
@@ -34,6 +35,7 @@ class AnswerResult:
     mode: str
     rerank: bool
     law_code: str | None
+    no_answer: bool = False
 
 
 class GenerationService:
@@ -60,12 +62,13 @@ class GenerationService:
         if not sources:
             return AnswerResult(
                 query=query,
-                answer="The retrieved sources do not contain enough information to answer.",
+                answer=NO_SOURCES_ANSWER,
                 citations=[],
                 sources=[],
                 mode=mode,
                 rerank=rerank,
                 law_code=law_code,
+                no_answer=True,
             )
 
         user_prompt = build_grounded_user_prompt(query, sources)
@@ -73,7 +76,10 @@ class GenerationService:
             system_prompt=GROUNDING_SYSTEM_PROMPT,
             user_prompt=user_prompt,
         )
-        citations = _citations_for_answer(answer, sources)
+        no_answer = NO_ANSWER_MARKER in answer
+        citations = _citations_for_answer(answer, sources, no_answer=no_answer)
+        if no_answer:
+            answer = answer.replace(NO_ANSWER_MARKER, "").strip() or NO_SOURCES_ANSWER
         return AnswerResult(
             query=query,
             answer=answer,
@@ -82,18 +88,23 @@ class GenerationService:
             mode=mode,
             rerank=rerank,
             law_code=law_code,
+            no_answer=no_answer,
         )
 
 
-def _citations_for_answer(answer: str, sources: list[ScoredChunk]) -> list[AnswerCitation]:
+def _citations_for_answer(
+    answer: str,
+    sources: list[ScoredChunk],
+    *,
+    no_answer: bool,
+) -> list[AnswerCitation]:
     allowed = {source.chunk.chunk_id: source.chunk for source in sources}
     cited_ids = _extract_chunk_ids(answer)
-    unsupported = _UNSUPPORTED_MARKER in answer.casefold()
 
     invalid = sorted(cited_id for cited_id in cited_ids if cited_id not in allowed)
     if invalid:
         raise CitationValidationError(f"Answer cited unknown chunk ids: {', '.join(invalid)}")
-    if not cited_ids and not unsupported:
+    if not cited_ids and not no_answer:
         raise CitationValidationError("Answer did not cite any retrieved chunk ids.")
 
     citations: list[AnswerCitation] = []
@@ -128,8 +139,9 @@ GROUNDING_SYSTEM_PROMPT = """You answer questions about German federal law texts
 
 Rules:
 - Use only the supplied source chunks.
-- If the chunks do not support an answer, say that the retrieved sources do not
-  contain enough information.
+- If the chunks do not support an answer, start your reply with the exact token
+  [NO_ANSWER], then say briefly, in the language of the question, that the
+  retrieved sources do not contain enough information.
 - Cite every sourced claim with one or more exact chunk IDs in square brackets.
 - Do not cite laws or chunk IDs that are not present in the supplied sources.
 - Keep the answer concise and practical.
