@@ -11,8 +11,13 @@ make eval
 uv run python scripts/run_eval.py --include-rerank
 ```
 
-The report compares BM25, dense, and hybrid search using hit rate, precision at k,
-and mean reciprocal rank. Each mode runs twice: with the exact-reference boost
+The report compares BM25, dense, and hybrid search using hit@k, precision@k,
+recall@k, MRR@k (default k=5), and nDCG@10. Every metric is averaged over all
+answerable cases, and a case that fails counts as 0. Most questions have one
+relevant chunk, so precision@5 tops out at 0.2 for them; recall@k and nDCG@10 are
+more informative for questions that span several sections. Unanswerable
+questions (`expected_source_chunks: []`) are counted but not scored, since ranking
+metrics are undefined without relevant chunks. Each mode runs twice: with the exact-reference boost
 (chunks matching a law code and section named in the query, such as `§ 242 StGB`,
 are ranked first) and without it (`*_no_boost`). Use `--boost on` or `--boost off`
 to run only one. The API uses the `EXACT_REFERENCE_BOOST` setting. Reports are written to `results/`; the repository keeps
@@ -21,7 +26,8 @@ Check completed-case counts and errors before comparing scores. These results
 measure retrieval on a small set, not the correctness of generated legal answers.
 
 To add a question, use an existing record as an example. Required fields are
-`id`, `query`, `expected_answer`, and a nonempty `expected_source_chunks` list.
+`id`, `query`, `expected_answer`, and an `expected_source_chunks` list (empty
+for questions the corpus cannot answer).
 Chunk IDs come from the runtime JSONL file (`data/processed/chunks.curated.jsonl`).
 Its records contain text, source IDs, offsets, and metadata such as law code,
 citation, heading hierarchy, and source URL. Long sections can span several IDs.

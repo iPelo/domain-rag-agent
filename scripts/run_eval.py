@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import statistics
 import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -16,6 +15,7 @@ sys.path.insert(0, str(ROOT_DIR / "backend"))
 
 DEFAULT_GOLDEN_SET = ROOT_DIR / "eval" / "golden_set.jsonl"
 DEFAULT_OUT_DIR = ROOT_DIR / "eval" / "results"
+NDCG_K = 10
 
 
 @dataclass(frozen=True)
@@ -71,6 +71,11 @@ def main() -> None:
     cases = _load_cases(args.golden_set)
     if not cases:
         raise SystemExit(f"{args.golden_set} is empty.")
+    # Unanswerable questions have no relevant chunks, so ranking metrics are
+    # undefined for them. They are counted here and scored by the answer eval.
+    answerable = [case for case in cases if case["expected_source_chunks"]]
+    unanswerable_count = len(cases) - len(answerable)
+    fetch_k = max(args.top_k, NDCG_K)
 
     configs = build_configs(boost=args.boost, include_rerank=args.include_rerank)
 
@@ -81,7 +86,10 @@ def main() -> None:
         "run_id": run_id,
         "golden_set": _display_path(args.golden_set),
         "case_count": len(cases),
+        "answerable_cases": len(answerable),
+        "unanswerable_cases": unanswerable_count,
         "top_k": args.top_k,
+        "ndcg_k": NDCG_K,
         "results": {},
     }
 
@@ -91,7 +99,7 @@ def main() -> None:
                 "mode": config.mode,
                 "rerank": config.rerank,
                 "exact_boost": config.exact_boost,
-                "summary": _summarize([], total_cases=len(cases)),
+                "summary": _summarize([], total_cases=len(answerable)),
                 "errors": [qdrant_error or "Qdrant collection is not ready."],
                 "cases": [],
             }
@@ -99,13 +107,12 @@ def main() -> None:
 
         rows: list[dict[str, Any]] = []
         errors: list[str] = []
-        for case in cases:
-            expected = set(case["expected_source_chunks"])
+        for case in answerable:
             try:
                 retrieved = service.retrieve(
                     case["query"],
                     mode=config.mode,  # type: ignore[arg-type]
-                    top_k=args.top_k,
+                    top_k=fetch_k,
                     rerank=config.rerank,
                     exact_boost=config.exact_boost,
                 )
@@ -114,27 +121,13 @@ def main() -> None:
                 continue
 
             retrieved_ids = [item.chunk.chunk_id for item in retrieved]
-            rows.append(
-                {
-                    "id": case["id"],
-                    "query": case["query"],
-                    "expected_source_chunks": sorted(expected),
-                    "retrieved_source_chunks": retrieved_ids,
-                    "hit": bool(expected.intersection(retrieved_ids[: args.top_k])),
-                    "precision_at_k": precision_at_k(
-                        retrieved_ids,
-                        expected,
-                        k=args.top_k,
-                    ),
-                    "mrr": mean_reciprocal_rank(retrieved_ids, expected),
-                }
-            )
+            rows.append(score_case(case, retrieved_ids, top_k=args.top_k))
 
         report["results"][config.name] = {
             "mode": config.mode,
             "rerank": config.rerank,
             "exact_boost": config.exact_boost,
-            "summary": _summarize(rows, total_cases=len(cases)),
+            "summary": _summarize(rows, total_cases=len(answerable)),
             "errors": errors,
             "cases": rows,
         }
@@ -196,27 +189,52 @@ def _validate_case(case: dict[str, Any], line_number: int) -> None:
     missing = sorted(required - set(case))
     if missing:
         raise SystemExit(f"golden set line {line_number} missing: {', '.join(missing)}")
-    if not isinstance(case["expected_source_chunks"], list) or not case["expected_source_chunks"]:
-        raise SystemExit(f"golden set line {line_number} needs expected_source_chunks.")
+    if not isinstance(case["expected_source_chunks"], list):
+        raise SystemExit(f"golden set line {line_number}: expected_source_chunks must be a list.")
+
+
+def score_case(case: dict[str, Any], retrieved_ids: list[str], *, top_k: int) -> dict[str, Any]:
+    from app.evaluation.metrics import (
+        hit_at_k,
+        ndcg_at_k,
+        precision_at_k,
+        recall_at_k,
+        reciprocal_rank,
+    )
+
+    expected = set(case["expected_source_chunks"])
+    return {
+        "id": case["id"],
+        "query": case["query"],
+        "expected_source_chunks": sorted(expected),
+        "retrieved_source_chunks": retrieved_ids,
+        "hit": hit_at_k(retrieved_ids, expected, k=top_k),
+        "precision_at_k": precision_at_k(retrieved_ids, expected, k=top_k),
+        "recall_at_k": recall_at_k(retrieved_ids, expected, k=top_k),
+        "mrr": reciprocal_rank(retrieved_ids, expected, k=top_k),
+        "ndcg_at_10": ndcg_at_k(retrieved_ids, expected, k=NDCG_K),
+    }
+
+
+SUMMARY_METRICS = {
+    "hit_rate": "hit",
+    "mean_precision_at_k": "precision_at_k",
+    "mean_recall_at_k": "recall_at_k",
+    "mean_mrr": "mrr",
+    "mean_ndcg_at_10": "ndcg_at_10",
+}
 
 
 def _summarize(rows: list[dict[str, Any]], *, total_cases: int) -> dict[str, float | int]:
-    completed = len(rows)
-    if not rows:
-        return {
-            "completed_cases": completed,
-            "total_cases": total_cases,
-            "hit_rate": 0.0,
-            "mean_precision_at_k": 0.0,
-            "mean_mrr": 0.0,
-        }
-    return {
-        "completed_cases": completed,
+    """Average each metric over all answerable cases; failed cases count as 0."""
+    summary: dict[str, float | int] = {
+        "completed_cases": len(rows),
         "total_cases": total_cases,
-        "hit_rate": sum(1 for row in rows if row["hit"]) / total_cases,
-        "mean_precision_at_k": statistics.fmean(row["precision_at_k"] for row in rows),
-        "mean_mrr": statistics.fmean(row["mrr"] for row in rows),
     }
+    for name, key in SUMMARY_METRICS.items():
+        total = sum(float(row[key]) for row in rows)
+        summary[name] = total / total_cases if total_cases else 0.0
+    return summary
 
 
 def _markdown_report(report: dict[str, Any]) -> str:
@@ -225,19 +243,22 @@ def _markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- Run: `{report['run_id']}`",
         f"- Golden set: `{report['golden_set']}`",
-        f"- Cases: {report['case_count']}",
+        f"- Cases: {report['case_count']} "
+        f"({report.get('answerable_cases', report['case_count'])} answerable, "
+        f"{report.get('unanswerable_cases', 0)} unanswerable; only answerable cases are scored)",
         f"- Top-k: {report['top_k']}",
         "",
         "## Summary",
         "",
-        "| Config | Boost | Completed | Hit rate | Mean precision@k | Mean MRR | Errors |",
-        "|---|---|---:|---:|---:|---:|---:|",
+        "| Config | Boost | Completed | Hit@k | Precision@k | Recall@k | MRR@k | nDCG@10 "
+        "| Errors |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for name, result in report["results"].items():
         summary = result["summary"]
         row_format = (
             "| {name} | {boost} | {completed}/{total} | {hit:.3f} | {precision:.3f} | "
-            "{mrr:.3f} | {errors} |"
+            "{recall:.3f} | {mrr:.3f} | {ndcg:.3f} | {errors} |"
         )
         lines.append(
             row_format.format(
@@ -247,7 +268,9 @@ def _markdown_report(report: dict[str, Any]) -> str:
                 total=summary["total_cases"],
                 hit=summary["hit_rate"],
                 precision=summary["mean_precision_at_k"],
+                recall=summary["mean_recall_at_k"],
                 mrr=summary["mean_mrr"],
+                ndcg=summary["mean_ndcg_at_10"],
                 errors=len(result["errors"]),
             )
         )
@@ -262,27 +285,6 @@ def _markdown_report(report: dict[str, Any]) -> str:
 
     lines.append("")
     return "\n".join(lines)
-
-
-def precision_at_k(retrieved_ids: list[str], expected_ids: set[str], *, k: int) -> float:
-    if k <= 0:
-        raise ValueError("k must be positive")
-    if not expected_ids:
-        return 0.0
-
-    top_k = retrieved_ids[:k]
-    hits = sum(1 for item_id in top_k if item_id in expected_ids)
-    return hits / k
-
-
-def mean_reciprocal_rank(retrieved_ids: list[str], expected_ids: set[str]) -> float:
-    if not expected_ids:
-        return 0.0
-
-    for index, item_id in enumerate(retrieved_ids, start=1):
-        if item_id in expected_ids:
-            return 1.0 / index
-    return 0.0
 
 
 if __name__ == "__main__":
