@@ -22,27 +22,53 @@ ingest → chunk → BM25 + Qdrant → RRF → rerank → grounded answer → ci
 
 ## Evaluation
 
-Retrieval on the golden set, top-k = 5 ([full report](eval/results/latest.md)):
+Retrieval on the 96-question golden set (84 answerable, 12 unanswerable), top-k = 5,
+curated index (30 laws, 15,174 chunks). Run `20261123T191431Z`
+([full report](eval/results/latest.md)):
 
-| Config | Hit@5 | Precision@5 | MRR@5 |
-|---|---:|---:|---:|
-| BM25 | 0.886 | 0.177 | 0.777 |
-| Dense | 0.977 | 0.195 | 0.883 |
-| Hybrid (RRF) | **1.000** | **0.200** | **0.920** |
+| Config | Hit@5 | Recall@5 | MRR@5 | nDCG@10 |
+|---|---:|---:|---:|---:|
+| BM25 | 0.667 | 0.593 | 0.563 | 0.553 |
+| Dense | **0.845** | **0.778** | **0.720** | 0.734 |
+| Hybrid (RRF) | 0.798 | 0.724 | 0.701 | 0.692 |
+| Hybrid + rerank | 0.833 | 0.760 | 0.717 | **0.738** |
 
-Run `20260730T221110Z`, on the original 44 questions with the exact-reference
-boost on. That report did not record the index scope. Most of these questions
-have one relevant chunk, so precision@5 cannot exceed 0.2.
+Only answerable questions are scored; the unanswerable ones are scored by the
+answer eval. nDCG@10 per question category:
 
-<!-- TODO: after `make eval`, add the results for the expanded 96-question set:
-     recall@5 and nDCG@10, boost on vs. off, and the index scope from the report. -->
+| Category | Questions | BM25 | Dense | Hybrid | Hybrid + rerank |
+|---|---:|---:|---:|---:|---:|
+| Original | 44 | 0.812 | 0.913 | 0.941 | 0.928 |
+| Colloquial | 21 | 0.069 | 0.401 | 0.256 | 0.443 |
+| Multi-section | 19 | 0.486 | 0.687 | 0.599 | 0.627 |
+
+What this shows:
+
+- **The original 44 questions were saturated.** Hybrid reached Hit@5 = 1.000 on
+  them, which hid the real weaknesses. They mostly reuse the statute's own wording,
+  so BM25 does well and RRF has two good lists to merge.
+- **Hybrid is not the best mode on the harder set.** On colloquial questions BM25
+  barely finds anything (nDCG@10 0.069), and equal-weight RRF lets those weak BM25
+  ranks pull dense results down. Dense alone beats plain hybrid in every new category.
+- **The reranker recovers most of the gap** and is roughly on par with dense
+  (nDCG@10 0.738 vs 0.734, but MRR@5 0.717 vs 0.720), at the cost of a
+  cross-encoder pass per query.
+- **The exact-reference boost makes no measurable difference here.** No golden
+  question cites a specific section (`§ 242 StGB`), so the boost is barely
+  triggered: turning it off changes no BM25, dense or rerank metric and lowers
+  hybrid nDCG@10 from 0.692 to 0.688. The eval cannot say whether the boost helps.
+
+Next steps, to be validated on a held-out question set rather than tuned on
+this one:
+
+- Weighted RRF (or a dense-leaning weight) so a weak BM25 list counts for less.
+- Reranking by default, after measuring its latency.
+- Questions with explicit section references, so the boost is actually tested.
+
 <!-- TODO: after `make answer-eval JUDGE=1`, add abstention accuracy, claim citation
      coverage, and the mean judge score. -->
 
-The golden set now has 96 questions, including colloquial wording, answers that
-span several sections, and unanswerable questions. The answer eval checks that
-every claim is cited and that unanswerable questions are refused. See
-[eval/README.md](eval/README.md) for details.
+See [eval/README.md](eval/README.md) for the metrics, categories, and answer eval.
 
 ## Screenshot
 
