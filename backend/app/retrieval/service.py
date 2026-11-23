@@ -141,9 +141,11 @@ class RetrievalService:
         law_code: str | None,
     ) -> list[tuple[str, float]]:
         query_units = query_legal_units(query)
-        law_codes = query_law_codes(query, [chunk.law_code for chunk in self._store.chunks])
         if law_code:
-            law_codes.add(law_code.casefold())
+            # An explicit filter wins over law codes mentioned in the query.
+            law_codes = {law_code.casefold()}
+        else:
+            law_codes = query_law_codes(query, [chunk.law_code for chunk in self._store.chunks])
         if not query_units or not law_codes:
             return ranked
 

@@ -101,3 +101,11 @@ def test_exact_boost_setting_is_the_default(service, monkeypatch):
     results = service.retrieve("Art. 5 GG", mode="dense", top_k=3)
 
     assert results[0].chunk.chunk_id == "german-laws::gg::art-1"
+
+
+@pytest.mark.parametrize("mode", ["bm25", "dense", "hybrid"])
+def test_exact_reference_respects_law_filter(service, mode):
+    results = service.retrieve("Art. 5 GG", mode=mode, top_k=3, law_code="BGB")
+
+    assert results
+    assert all(result.chunk.law_code == "BGB" for result in results)
