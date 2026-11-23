@@ -32,7 +32,7 @@ def recall_at_k(retrieved: Sequence[str], expected: Set[str], *, k: int) -> floa
     _check_k(k)
     if not expected:
         return 0.0
-    return len(expected.intersection(retrieved[:k])) / len(expected)
+    return sum(1 for item in set(retrieved[:k]) if item in expected) / len(expected)
 
 
 def reciprocal_rank(retrieved: Sequence[str], expected: Set[str], *, k: int) -> float:
