@@ -1,4 +1,4 @@
-.PHONY: install dev chunks index index-all chunking-compare queries eval test lint frontend-build verify format up down
+.PHONY: install dev chunks index index-all chunking-compare queries eval answer-eval test lint frontend-build verify format up down
 
 install:
 	uv sync --extra dev
@@ -23,6 +23,9 @@ queries:
 
 eval:
 	uv run python scripts/run_eval.py
+
+answer-eval:
+	uv run python scripts/run_answer_eval.py $(if $(JUDGE),--judge,)
 
 test:
 	uv run pytest

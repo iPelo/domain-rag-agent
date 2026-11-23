@@ -46,3 +46,22 @@ citation, heading hierarchy, and source URL. Long sections can span several IDs.
 `make queries` runs the separate informal examples in `example_queries.jsonl`.
 `make chunking-compare` compares legal-heading, fixed, and recursive splitting on
 six laws. Its lowercase-first-letter check is only a heuristic for sentence cuts.
+
+## Answer evaluation
+
+`answer_set.jsonl` has 20 cases taken from the golden set: 14 answerable and 6
+unanswerable. `make answer-eval` generates an answer for each one with the
+configured `MODEL_*` endpoint and checks:
+
+- **Abstention:** answerable questions get an answer, and unanswerable ones get
+  `no_answer`. Answers rejected by the service's citation check count as wrong.
+- **Claim citations:** the answer is split into sentences and list items (a
+  heuristic that keeps abbreviations such as `Abs.` and `Nr.` together). Every
+  claim must cite a retrieved chunk ID, and no unknown IDs may appear.
+- **Expected sources:** whether at least one expected chunk was cited.
+- **Faithfulness (optional):** `make answer-eval JUDGE=1` asks an LLM judge to
+  score each answered case from 1 to 5 against `expected_answer` and the cited
+  source text. Set `JUDGE_MODEL_*` to use a different model than the one being
+  evaluated. Judge scores are only a rough signal, not a legal review.
+
+Reports are written to `results/answer_eval_<run>.md` and `results/answer_latest.*`.

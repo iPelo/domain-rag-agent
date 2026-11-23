@@ -1,6 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -36,11 +36,20 @@ class Settings(BaseSettings):
     model_max_tokens: int = 800
     model_timeout_seconds: float = 60.0
 
+    # Optional separate model for the answer eval's LLM judge; unset values
+    # fall back to the MODEL_* settings above.
+    judge_model_name: str | None = None
+    judge_model_base_url: str | None = None
+    judge_model_api_key: str | None = None
+
     @field_validator(
         "embedding_device",
         "model_name",
         "model_base_url",
         "model_api_key",
+        "judge_model_name",
+        "judge_model_base_url",
+        "judge_model_api_key",
         mode="before",
     )
     @classmethod
@@ -54,6 +63,16 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    def judge_settings(self) -> Self:
+        """Settings for the eval judge, using JUDGE_MODEL_* where set."""
+        return self.model_copy(
+            update={
+                "model_name": self.judge_model_name or self.model_name,
+                "model_base_url": self.judge_model_base_url or self.model_base_url,
+                "model_api_key": self.judge_model_api_key or self.model_api_key,
+            }
+        )
 
 
 @lru_cache

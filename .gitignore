@@ -36,6 +36,8 @@ eval/results/*
 !eval/results/.gitkeep
 !eval/results/latest.json
 !eval/results/latest.md
+!eval/results/answer_latest.json
+!eval/results/answer_latest.md
 
 # Local databases and vector stores
 *.db

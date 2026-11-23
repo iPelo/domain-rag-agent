@@ -99,7 +99,7 @@ def _citations_for_answer(
     no_answer: bool,
 ) -> list[AnswerCitation]:
     allowed = {source.chunk.chunk_id: source.chunk for source in sources}
-    cited_ids = _extract_chunk_ids(answer)
+    cited_ids = extract_chunk_ids(answer)
 
     invalid = sorted(cited_id for cited_id in cited_ids if cited_id not in allowed)
     if invalid:
@@ -125,7 +125,7 @@ def _citations_for_answer(
     return citations
 
 
-def _extract_chunk_ids(answer: str) -> list[str]:
+def extract_chunk_ids(answer: str) -> list[str]:
     ids: list[str] = []
     for bracketed in _CITATION_RE.findall(answer):
         for part in bracketed.split(","):
