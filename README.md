@@ -72,8 +72,7 @@ See [eval/README.md](eval/README.md) for the metrics, categories, and answer eva
 
 ## Screenshot
 
-<!-- TODO: save a screenshot of the console as docs/screenshot.png and replace this
-     comment with: ![GermanLawRAG console](docs/screenshot.png) -->
+![GermanLawRAG console: a colloquial tenancy question retrieves BGB § 573 and related sections](docs/screenshot.png)
 
 ## Setup
 
